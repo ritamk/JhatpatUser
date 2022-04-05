@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jhatpat/shared/providers.dart';
+import 'package:jhatpat/views/auth/otp_verification_field.dart';
 import 'package:jhatpat/views/auth/phone_num_field.dart';
 
 class AuthenticationPage extends StatelessWidget {
@@ -22,11 +25,19 @@ class AuthenticationPage extends StatelessWidget {
                     "assets/images/LogoWTxtSmaller.png",
                     scale: 4,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(22.0),
-                    child: Material(
-                        child: PhoneNumberField(),
-                        type: MaterialType.transparency),
+                  Padding(
+                    padding: const EdgeInsets.all(22.0),
+                    child: Consumer(
+                      builder: (context, ref, __) {
+                        bool otpBool = ref.watch(otpScreenBoolProvider);
+                        return Material(
+                          child: otpBool
+                              ? const OTPVerificationField()
+                              : const PhoneNumberField(),
+                          type: MaterialType.transparency,
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

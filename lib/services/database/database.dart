@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:jhatpat/models/user.dart';
 
 class DatabaseService {
   final String _apiSite = "https://demo.karukatha.com/apis";
-  final String _logRegUrl = "/login_register";
+  final String _postLogRegUrl = "/login_register";
 
-  // Future<String>
-  postLoginRegister({String? phNum}) async {
-    Uri url = Uri.parse(_apiSite + _logRegUrl);
+  Future<UserProfileData?> postLoginRegister({String? phNum}) async {
+    Uri url = Uri.parse(_apiSite + _postLogRegUrl);
     try {
       Response response = await post(
         url,
@@ -21,9 +21,15 @@ class DatabaseService {
       );
       print(response.body);
       Map decodedResponse = jsonDecode(response.body);
-      return decodedResponse["success"] == "1"
-          ? decodedResponse["data"]["token"]
-          : Future.error("Something went wrong, please try again");
+      if (decodedResponse["success"] == "1") {
+        return UserProfileData(
+          phone: decodedResponse["data"]["phone"],
+          token: decodedResponse["data"]["token"],
+          otp: decodedResponse["data"]["otp"],
+        );
+      } else {
+        return Future.error("Something went wrong, please try again");
+      }
     } catch (e) {
       print("postLoginRegister: ${e.toString()}");
       return Future.error(e.toString());
