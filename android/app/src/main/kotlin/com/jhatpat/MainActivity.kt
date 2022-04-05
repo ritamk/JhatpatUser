@@ -1,4 +1,4 @@
-package kon.ritam.jhatpat
+package com.jhatpat
 
 import io.flutter.embedding.android.FlutterActivity
 

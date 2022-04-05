@@ -34,14 +34,16 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
                 fontWeight: FontWeight.bold,
                 color: Colors.black),
           ),
-          Consumer(builder: (context, ref, __) {
-            return Text(
-              "\nPlease check your messages for the OTP"
-              "\nthat has been sent to +91${ref.watch(phoneNumProvider)}",
-              style: const TextStyle(color: Colors.black),
-              textAlign: TextAlign.center,
-            );
-          }),
+          Consumer(
+            builder: (context, ref, __) {
+              return Text(
+                "\nPlease check your messages for the OTP"
+                "\nthat has been sent to +91${ref.watch(phoneNumProvider)}",
+                style: const TextStyle(color: Colors.black),
+                textAlign: TextAlign.center,
+              );
+            },
+          ),
           const SizedBox(height: 30.0, width: 0.0),
           TextFormField(
             keyboardType: TextInputType.number,
@@ -53,42 +55,51 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
           ),
-          const SizedBox(height: 20.0, width: 0.0),
-          Consumer(builder: (context, ref, __) {
-            return Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: resendOtpButton(context, ref),
-                child: !resendOtpLoading
+          const SizedBox(height: 5.0, width: 0.0),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Consumer(
+              builder: (context, ref, __) {
+                return TextButton(
+                  style: ButtonStyle(
+                      padding:
+                          MaterialStateProperty.all(const EdgeInsets.all(0.0))),
+                  onPressed: () => resendOtpButton(context, ref),
+                  child: !resendOtpLoading
+                      ? const Text(
+                          "Resend OTP",
+                          style: TextStyle(
+                              fontSize: 15.0,
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold),
+                        )
+                      : const Loading(white: false),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 5.0, width: 0.0),
+          Consumer(
+            builder: (context, ref, __) {
+              return MaterialButton(
+                onPressed: () => verifyButton(context, ref),
+                child: !loading
                     ? const Text(
-                        "Resent OTP",
-                        style: TextStyle(
-                            color: Colors.black54, fontWeight: FontWeight.bold),
+                        "Verify",
+                        style: TextStyle(fontSize: 16.0),
                       )
-                    : const Loading(white: false),
-              ),
-            );
-          }),
-          const SizedBox(height: 20.0, width: 0.0),
-          Consumer(builder: (context, ref, __) {
-            return MaterialButton(
-              onPressed: () => verifyButton(context, ref),
-              child: !loading
-                  ? const Text(
-                      "Verify",
-                      style: TextStyle(fontSize: 16.0),
-                    )
-                  : const Loading(white: true),
-              minWidth: double.infinity,
-              elevation: 0.0,
-              focusElevation: 0.0,
-              highlightElevation: 0.0,
-              color: Colors.black,
-              textColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0)),
-            );
-          }),
+                    : const Loading(white: true),
+                minWidth: double.infinity,
+                elevation: 0.0,
+                focusElevation: 0.0,
+                highlightElevation: 0.0,
+                color: Colors.black,
+                textColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -103,11 +114,11 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
           .getResendOtp()
           .whenComplete(() => setState(() => resendOtpLoading = false));
 
-      commonSnackbar(
-          resentOrNot
-              ? "OTP resent"
-              : "OTP could not be resent,\nPlease try again",
-          context);
+      if (resentOrNot) {
+        commonSnackbar("OTP resent", context);
+      } else {
+        commonSnackbar("Could not generate OTP, please try again", context);
+      }
     } catch (e) {
       commonSnackbar("Something went wrong, please try again", context);
     }
