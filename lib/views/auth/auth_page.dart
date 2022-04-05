@@ -85,6 +85,8 @@ class AuthenticationPage extends StatelessWidget {
             ),
           ),
         ],
+        physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics()),
       ),
     );
   }
