@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/views/auth/auth_page.dart';
+import 'package:jhatpat/views/home/home.dart';
 
 class WrapperPage extends StatefulWidget {
   const WrapperPage({Key? key}) : super(key: key);
@@ -21,7 +23,10 @@ class _WrapperPageState extends State<WrapperPage> {
   Future splashMethod() async {
     await Future.delayed(Duration(seconds: _wrapperDuration)).whenComplete(
       () => Navigator.of(context).pushAndRemoveUntil(
-          CupertinoPageRoute(builder: (context) => const AuthenticationPage()),
+          CupertinoPageRoute(
+              builder: (context) => !UserSharedPreferences.getLoggedInOrNot()
+                  ? const AuthenticationPage()
+                  : const HomePage()),
           (route) => false),
     );
   }

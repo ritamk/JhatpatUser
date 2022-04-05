@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jhatpat/shared/shared_pref.dart';
+import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/wrapper.dart';
 
 void main() async {

@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jhatpat/shared/providers.dart';
+import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/views/auth/otp_verification_field.dart';
 import 'package:jhatpat/views/auth/phone_num_field.dart';
+import 'package:jhatpat/views/home/home.dart';
 
 class AuthenticationPage extends StatelessWidget {
   const AuthenticationPage({Key? key}) : super(key: key);
@@ -85,5 +87,12 @@ class AuthenticationPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  goHome(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(builder: (context) => const HomePage()),
+        (route) => false);
   }
 }

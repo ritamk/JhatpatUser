@@ -4,8 +4,7 @@ import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/shared/auth_text_field.dart';
 import 'package:jhatpat/shared/loading.dart';
-import 'package:jhatpat/shared/providers.dart';
-import 'package:jhatpat/shared/shared_pref.dart';
+import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/shared/snackbars.dart';
 
 class PhoneNumberField extends StatefulWidget {
@@ -77,15 +76,16 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
         final UserLoginRegData? result =
             await DatabaseService().postLoginRegister(phNum: _phoneNum);
         if (result.runtimeType == UserLoginRegData) {
-          await UserSharedPreferences.setUserPhoneNum(_phoneNum).whenComplete(
-            () async => await UserSharedPreferences.setUserToken(result!.token)
-                .whenComplete(() => setState(() => loading = false)),
-          );
+          setState(() {
+            loading = false;
+            ref.read(otpScreenBoolProvider.state).state = true;
+            ref.read(tokenProvider.state).state = result?.token;
+          });
+        } else {
+          commonSnackbar("Something went wrong, please try again", context);
+          setState(() => loading = false);
         }
-        setState(() {
-          ref.read(otpScreenBoolProvider.state).state = true;
-          ref.read(tokenProvider.state).state = result?.token;
-        });
+        setState(() {});
       } catch (e) {
         commonSnackbar(e.toString(), context);
         setState(() => loading = false);

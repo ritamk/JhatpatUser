@@ -1,13 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jhatpat/services/database/database.dart';
+import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/auth_text_field.dart';
 import 'package:jhatpat/shared/loading.dart';
-import 'package:jhatpat/shared/providers.dart';
+import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/shared/snackbars.dart';
+import 'package:jhatpat/views/home/home.dart';
 
 class OTPVerificationField extends StatefulWidget {
   const OTPVerificationField({Key? key}) : super(key: key);
+  // final Function? homeFxn;
 
   @override
   State<OTPVerificationField> createState() => OTPVerificationFieldState();
@@ -134,10 +138,31 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
         try {
           final bool verifiedOrNot = await DatabaseService(token: token)
               .postVerifyOtp(_otp)
-              .whenComplete(() => setState(() => loading = false));
+              .whenComplete(() {
+            setState(() => loading = false);
+          });
 
-          commonSnackbar(
-              verifiedOrNot ? "OTP Verified" : "Couldn't verify OTP", context);
+          // commonSnackbar(
+          //     verifiedOrNot ? "OTP Verified" : "Couldn't verify OTP", context);
+
+          if (verifiedOrNot) {
+            await UserSharedPreferences.setLoggedInOrNot(true)
+                .whenComplete(() async =>
+                    await UserSharedPreferences.setUserPhoneNum(
+                        ref.watch(phoneNumProvider)))
+                .whenComplete(
+                    () async => await UserSharedPreferences.setUserToken(token))
+                .whenComplete(
+                  () => Navigator.pushAndRemoveUntil(
+                      context,
+                      CupertinoPageRoute(
+                          builder: (context) => const HomePage()),
+                      (route) => false),
+                );
+          } else {
+            await UserSharedPreferences.setLoggedInOrNot(false).whenComplete(
+                () => commonSnackbar("OTP does not match", context));
+          }
 
           ref.read(otpScreenBoolProvider.state).state = false;
         } catch (e) {
