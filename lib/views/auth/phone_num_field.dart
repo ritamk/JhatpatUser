@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/shared/auth_text_field.dart';
+import 'package:jhatpat/shared/snackbars.dart';
 
 class PhoneNumberField extends StatefulWidget {
   const PhoneNumberField({
@@ -140,7 +142,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
               "You should receive an SMS for verification."
               "\nMessage and data rates may apply.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.black45),
             ),
           ],
         ),
@@ -148,8 +150,22 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
     }
   }
 
-  continueButton(BuildContext context) {
+  @override
+  void dispose() {
+    _otpFocusNode.dispose();
+    _phoneFocusNode.dispose();
+    super.dispose();
+  }
+
+  continueButton(BuildContext context) async {
     if (_phNoGlobalKey.currentState!.validate()) {
+      try {
+        final String result =
+            await DatabaseService().postLoginRegister(phNum: _phoneNum);
+        print(result);
+      } catch (e) {
+        commonSnackbar(e.toString(), context);
+      }
       setState(() {
         _otpScreen = true;
       });

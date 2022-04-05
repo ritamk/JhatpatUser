@@ -13,7 +13,7 @@ InputDecoration authTextInputDecoration(
     border: textFieldBorder(),
     focusedBorder: textFieldBorder(),
     errorBorder: textFieldBorder(),
-    errorStyle: const TextStyle(color: Colors.white),
+    errorStyle: const TextStyle(color: Color.fromRGBO(223, 92, 82, 1.0)),
   );
 }
 

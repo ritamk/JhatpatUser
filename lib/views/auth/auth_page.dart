@@ -45,24 +45,22 @@ class AuthenticationPage extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 5.0),
                     child: RichText(
                       textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: TextStyle(
-                            fontSize: 12.0,
-                            color: Colors.deepOrange.withAlpha(150)),
+                      text: const TextSpan(
+                        style: TextStyle(fontSize: 12.0, color: Colors.white54),
                         children: <InlineSpan>[
-                          const TextSpan(
+                          TextSpan(
                               text: "By signing up, you have agreed to our"),
                           TextSpan(
                             text: "\nTerms of Use",
                             style: TextStyle(
-                                color: Colors.white.withAlpha(180),
+                                color: Colors.white70,
                                 fontWeight: FontWeight.bold),
                           ),
-                          const TextSpan(text: " & "),
+                          TextSpan(text: " & "),
                           TextSpan(
                             text: "Privacy Policy",
                             style: TextStyle(
-                                color: Colors.white.withAlpha(180),
+                                color: Colors.white70,
                                 fontWeight: FontWeight.bold),
                           ),
                         ],
