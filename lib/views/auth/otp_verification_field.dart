@@ -142,9 +142,6 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
             setState(() => loading = false);
           });
 
-          // commonSnackbar(
-          //     verifiedOrNot ? "OTP Verified" : "Couldn't verify OTP", context);
-
           if (verifiedOrNot) {
             await UserSharedPreferences.setLoggedInOrNot(true)
                 .whenComplete(() async =>
