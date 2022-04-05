@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/shared/auth_text_field.dart';
+import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/providers.dart';
 import 'package:jhatpat/shared/shared_pref.dart';
 import 'package:jhatpat/shared/snackbars.dart';
@@ -31,22 +32,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
                 "Phone number", Icons.phone_android, "+91 "),
             style: const TextStyle(color: Colors.black, fontSize: 16.0),
             focusNode: _phoneFocusNode,
-            validator: (val) {
-              if (val != null) {
-                if (val.isEmpty) {
-                  return "Please enter your phone number";
-                } else if (val.isNotEmpty &&
-                    (val.length < 10 ||
-                        val.length > 10 ||
-                        !val.contains(RegExp("[0-9]")))) {
-                  return "Please enter a valid phone number";
-                } else {
-                  return null;
-                }
-              } else {
-                return "Please enter your phone number";
-              }
-            },
+            validator: validation,
             onChanged: (val) => _phoneNum = val,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
@@ -55,10 +41,12 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
           Consumer(builder: (context, ref, __) {
             return MaterialButton(
               onPressed: () => continueButton(context, ref),
-              child: const Text(
-                "Continue",
-                style: TextStyle(fontSize: 16.0),
-              ),
+              child: !loading
+                  ? const Text(
+                      "Continue",
+                      style: TextStyle(fontSize: 16.0),
+                    )
+                  : const Loading(white: true),
               minWidth: double.infinity,
               elevation: 0.0,
               focusElevation: 0.0,
@@ -83,20 +71,44 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
 
   continueButton(BuildContext context, WidgetRef ref) async {
     if (_phNoGlobalKey.currentState!.validate()) {
-      ref.read(phoneNumProvider.state).state = _phoneNum;
+      setState(() => loading = true);
 
       try {
-        final UserProfileData? result =
+        final UserLoginRegData? result =
             await DatabaseService().postLoginRegister(phNum: _phoneNum);
-        if (result.runtimeType == UserProfileData) {
-          await UserSharedPreferences.setUserToken(result!.token!)
-              .whenComplete(() => loading = false);
+        if (result.runtimeType == UserLoginRegData) {
+          await UserSharedPreferences.setUserPhoneNum(_phoneNum).whenComplete(
+            () async => await UserSharedPreferences.setUserToken(result!.token)
+                .whenComplete(() => setState(() => loading = false)),
+          );
         }
+        setState(() {
+          ref.read(otpScreenBoolProvider.state).state = true;
+          ref.read(tokenProvider.state).state = result?.token;
+        });
       } catch (e) {
         commonSnackbar(e.toString(), context);
+        setState(() => loading = false);
       }
 
-      setState(() => ref.read(otpScreenBoolProvider.state).state = true);
+      ref.read(phoneNumProvider.state).state = _phoneNum;
+    }
+  }
+
+  String? validation(val) {
+    if (val != null) {
+      if (val.isEmpty) {
+        return "Please enter your phone number";
+      } else if (val.isNotEmpty &&
+          (val.length < 10 ||
+              val.length > 10 ||
+              !val.contains(RegExp("[0-9]")))) {
+        return "Please enter a valid phone number";
+      } else {
+        return null;
+      }
+    } else {
+      return "Please enter your phone number";
     }
   }
 

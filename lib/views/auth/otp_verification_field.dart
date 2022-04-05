@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/shared/auth_text_field.dart';
+import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/providers.dart';
+import 'package:jhatpat/shared/snackbars.dart';
 
 class OTPVerificationField extends StatefulWidget {
   const OTPVerificationField({Key? key}) : super(key: key);
@@ -44,22 +47,7 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
             decoration: authTextInputDecoration("4 digit OTP", Icons.lock, ""),
             style: const TextStyle(color: Colors.black, fontSize: 16.0),
             focusNode: _otpFocusNode,
-            validator: (val) {
-              if (val != null) {
-                if (val.isEmpty) {
-                  return "Please enter the OTP";
-                } else if (val.isNotEmpty &&
-                    (val.length < 4 ||
-                        val.length > 4 ||
-                        !val.contains(RegExp("[0-9]")))) {
-                  return "Please enter a valid OTP";
-                } else {
-                  return null;
-                }
-              } else {
-                return "Please enter the OTP";
-              }
-            },
+            validator: validation,
             onChanged: (val) => _otp = val,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
@@ -68,10 +56,12 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
           Consumer(builder: (context, ref, __) {
             return MaterialButton(
               onPressed: () => verifyButton(context, ref),
-              child: const Text(
-                "Verify",
-                style: TextStyle(fontSize: 16.0),
-              ),
+              child: !loading
+                  ? const Text(
+                      "Verify",
+                      style: TextStyle(fontSize: 16.0),
+                    )
+                  : const Loading(white: true),
               minWidth: double.infinity,
               elevation: 0.0,
               focusElevation: 0.0,
@@ -87,9 +77,44 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
     );
   }
 
-  verifyButton(BuildContext context, WidgetRef ref) {
+  verifyButton(BuildContext context, WidgetRef ref) async {
     if (_otpGlobalKey.currentState!.validate()) {
-      setState(() => ref.read(otpScreenBoolProvider.state).state = false);
+      setState(() => loading = true);
+
+      if (ref.watch(tokenProvider) != null) {
+        try {
+          final bool verifiedOrNot = await DatabaseService()
+              .postVerifyOtp(ref.watch(tokenProvider)!, _otp)
+              .whenComplete(() => setState(() => loading = false));
+
+          commonSnackbar(
+              verifiedOrNot ? "OTP Verified" : "Couldn't verify OTP", context);
+
+          ref.read(otpScreenBoolProvider.state).state = false;
+        } catch (e) {
+          commonSnackbar("Something went wrong, please try again", context);
+        }
+      } else {
+        commonSnackbar("No phone number provided", context);
+        setState(() => loading = false);
+      }
+    }
+  }
+
+  String? validation(val) {
+    if (val != null) {
+      if (val.isEmpty) {
+        return "Please enter the OTP";
+      } else if (val.isNotEmpty &&
+          (val.length < 4 ||
+              val.length > 4 ||
+              !val.contains(RegExp("[0-9]")))) {
+        return "Please enter a valid OTP";
+      } else {
+        return null;
+      }
+    } else {
+      return "Please enter the OTP";
     }
   }
 
