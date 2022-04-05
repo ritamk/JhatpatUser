@@ -88,11 +88,4 @@ class AuthenticationPage extends StatelessWidget {
       ),
     );
   }
-
-  goHome(BuildContext context) {
-    Navigator.pushAndRemoveUntil(
-        context,
-        CupertinoPageRoute(builder: (context) => const HomePage()),
-        (route) => false);
-  }
 }
