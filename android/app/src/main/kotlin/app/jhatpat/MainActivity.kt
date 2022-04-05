@@ -1,4 +1,4 @@
-package com.jhatpat
+package app.jhatpat
 
 import io.flutter.embedding.android.FlutterActivity
 
