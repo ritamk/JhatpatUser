@@ -19,6 +19,7 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
   final FocusNode _otpFocusNode = FocusNode();
 
   bool loading = false;
+  bool resendOtpLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +55,22 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
           ),
           const SizedBox(height: 20.0, width: 0.0),
           Consumer(builder: (context, ref, __) {
+            return Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: resendOtpButton(context, ref),
+                child: !resendOtpLoading
+                    ? const Text(
+                        "Resent OTP",
+                        style: TextStyle(
+                            color: Colors.black54, fontWeight: FontWeight.bold),
+                      )
+                    : const Loading(white: false),
+              ),
+            );
+          }),
+          const SizedBox(height: 20.0, width: 0.0),
+          Consumer(builder: (context, ref, __) {
             return MaterialButton(
               onPressed: () => verifyButton(context, ref),
               child: !loading
@@ -77,14 +94,35 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
     );
   }
 
+  resendOtpButton(BuildContext context, WidgetRef ref) async {
+    final String? token = ref.watch(tokenProvider);
+
+    setState(() => resendOtpLoading = true);
+    try {
+      final bool resentOrNot = await DatabaseService(token: token)
+          .getResendOtp()
+          .whenComplete(() => setState(() => resendOtpLoading = false));
+
+      commonSnackbar(
+          resentOrNot
+              ? "OTP resent"
+              : "OTP could not be resent,\nPlease try again",
+          context);
+    } catch (e) {
+      commonSnackbar("Something went wrong, please try again", context);
+    }
+  }
+
   verifyButton(BuildContext context, WidgetRef ref) async {
+    final String? token = ref.watch(tokenProvider);
+
     if (_otpGlobalKey.currentState!.validate()) {
       setState(() => loading = true);
 
-      if (ref.watch(tokenProvider) != null) {
+      if (token != null) {
         try {
-          final bool verifiedOrNot = await DatabaseService()
-              .postVerifyOtp(ref.watch(tokenProvider)!, _otp)
+          final bool verifiedOrNot = await DatabaseService(token: token)
+              .postVerifyOtp(_otp)
               .whenComplete(() => setState(() => loading = false));
 
           commonSnackbar(
