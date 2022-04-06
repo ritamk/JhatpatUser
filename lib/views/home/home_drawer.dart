@@ -32,7 +32,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
                 const Text("Welcome\n",
                     style: TextStyle(fontSize: 20.0, color: Colors.black54)),
                 profileCompleted
-                    ? Text(widget.userProfileData.name!)
+                    ? Text(
+                        "${widget.userProfileData.name!}\n${widget.userProfileData.email!}")
                     : TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();

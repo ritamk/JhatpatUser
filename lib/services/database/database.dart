@@ -29,6 +29,7 @@ class DatabaseService {
           },
         ),
       );
+      print(response.body);
       Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return UserLoginRegData(
@@ -56,6 +57,7 @@ class DatabaseService {
           },
         ),
       );
+      print(response.body);
       Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return true;
@@ -75,6 +77,7 @@ class DatabaseService {
         url,
         headers: {"user-token": token!},
       );
+      print(response.body);
       Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return true;
@@ -100,6 +103,7 @@ class DatabaseService {
           },
         ),
       );
+      print(response.body);
       Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return UserLocationData(
@@ -122,6 +126,7 @@ class DatabaseService {
         url,
         headers: {"user-token": token!},
       );
+      print(response.body);
       Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return UserProfileData(
@@ -155,6 +160,7 @@ class DatabaseService {
           },
         ),
       );
+      print(response.body);
       Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return true;

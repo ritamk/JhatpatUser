@@ -53,6 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 TextFormField(
+                  keyboardType: TextInputType.name,
                   controller: _nameController,
                   decoration:
                       authTextInputDecoration("Name", Icons.person, null),
@@ -64,11 +65,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (val) =>
                       FocusScope.of(context).requestFocus(_emailFocus),
-                  maxLength: 20,
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 ),
                 const SizedBox(height: 10.0, width: 0.0),
                 TextFormField(
+                  keyboardType: TextInputType.emailAddress,
                   controller: _emailController,
                   decoration:
                       authTextInputDecoration("Email", Icons.mail, null),
@@ -115,10 +115,13 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() => loading = true);
 
       try {
-        final bool result = await DatabaseService(
-                token: UserSharedPreferences.getUserToken()!)
-            .postUserDetails(
-                _name, _email, UserSharedPreferences.getUserPhoneNum()!, false);
+        final bool result =
+            await DatabaseService(token: UserSharedPreferences.getUserToken()!)
+                .postUserDetails(
+                    _name,
+                    _email,
+                    UserSharedPreferences.getUserPhoneNum()!,
+                    widget.profileCompleted ? true : false);
         setState(() => loading = false);
         if (result) {
           commonSnackbar("Profile updated successfully", context);
@@ -137,13 +140,13 @@ class _ProfilePageState extends State<ProfilePage> {
     if (val.isEmpty) {
       return "Please add a name";
     } else {
-      if (val.length < 3) {
-        return "Name can't be less than 3 letters";
+      if (val.length < 3 || val.length > 20) {
+        return "Name can't be less than 3 or more than 20 letters";
       } else {
-        if (!val.contains(RegExp("[A-B]")) && !val.contains(RegExp("[a-b]"))) {
-          return "Enter a proper name";
-        } else {
+        if (val.contains(RegExp(r"^[a-zA-Z ]+$"))) {
           return null;
+        } else {
+          return "Enter a proper name";
         }
       }
     }
@@ -153,13 +156,10 @@ class _ProfilePageState extends State<ProfilePage> {
     if (val.isEmpty) {
       return "Please add an email";
     } else {
-      if (!val.contains(RegExp("[A-B]")) &&
-          !val.contains(RegExp("[a-b]")) &&
-          !val.contains(RegExp("[0-9]")) &&
-          !val.contains(RegExp("[@, ., +]"))) {
-        return "Please enter a proper email address";
-      } else {
+      if (val.contains(RegExp(r"^[a-zA-Z0-9+.@]+$"))) {
         return null;
+      } else {
+        return "Please enter a proper email address";
       }
     }
   }
