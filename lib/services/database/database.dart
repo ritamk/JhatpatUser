@@ -15,6 +15,7 @@ class DatabaseService {
   final String _getResendOtp = "resendOtp";
   final String _postUpdateLocation = "updateCurrentLocation";
   final String _getUserDetails = "getUserProfileDetails";
+  final String _postUserDetails = "updateUserDetails";
 
   Future<UserLoginRegData?> postLoginRegister({String? phNum}) async {
     final Uri url = Uri.parse(_apiSite + _postLogRegUrl);
@@ -28,8 +29,7 @@ class DatabaseService {
           },
         ),
       );
-      print(response.body);
-      Map decodedResponse = jsonDecode(response.body);
+      Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return UserLoginRegData(
           phone: decodedResponse["data"]["phone"],
@@ -56,8 +56,7 @@ class DatabaseService {
           },
         ),
       );
-      print(response.body);
-      Map decodedResponse = jsonDecode(response.body);
+      Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return true;
       } else {
@@ -76,8 +75,7 @@ class DatabaseService {
         url,
         headers: {"user-token": token!},
       );
-      print(response.body);
-      Map decodedResponse = jsonDecode(response.body);
+      Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return true;
       } else {
@@ -102,8 +100,7 @@ class DatabaseService {
           },
         ),
       );
-      print(response.body);
-      Map decodedResponse = jsonDecode(response.body);
+      Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return UserLocationData(
             token: decodedResponse["data"]["token"],
@@ -125,8 +122,7 @@ class DatabaseService {
         url,
         headers: {"user-token": token!},
       );
-      print(response.body);
-      Map decodedResponse = jsonDecode(response.body);
+      Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
         return UserProfileData(
           phone: decodedResponse["data"]["User_Profile_Details"]["user_phone"],
@@ -139,6 +135,34 @@ class DatabaseService {
       }
     } catch (e) {
       print("getProfileDetails: ${e.toString()}");
+      return Future.error(e.toString());
+    }
+  }
+
+  Future<bool> postUserDetails(
+      String name, String email, String phNum, bool edit) async {
+    final Uri url = Uri.parse(_apiSite + _postUserDetails);
+    try {
+      Response response = await post(
+        url,
+        headers: {"user-token": token!},
+        body: jsonEncode(
+          {
+            "user_name": name,
+            "user_email": email,
+            "user_phone": phNum,
+            "edit_flag": edit ? "1" : "0",
+          },
+        ),
+      );
+      Map<String, dynamic> decodedResponse = jsonDecode(response.body);
+      if (decodedResponse["success"] == "1") {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print("postCurrentLocation: ${e.toString()}");
       return Future.error(e.toString());
     }
   }

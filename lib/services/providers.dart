@@ -5,3 +5,5 @@ final phoneNumProvider = StateProvider<String>((ref) => "");
 final otpScreenBoolProvider = StateProvider<bool>((ref) => false);
 
 final tokenProvider = StateProvider<String?>((ref) => null);
+
+final profileUpdated = StateProvider<bool>((ref) => false);

@@ -68,7 +68,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
     );
   }
 
-  continueButton(BuildContext context, WidgetRef ref) async {
+  void continueButton(BuildContext context, WidgetRef ref) async {
     if (_phNoGlobalKey.currentState!.validate()) {
       setState(() => loading = true);
 

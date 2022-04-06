@@ -109,7 +109,7 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
     );
   }
 
-  resendOtpButton(BuildContext context, WidgetRef ref) async {
+  void resendOtpButton(BuildContext context, WidgetRef ref) async {
     final String? token = ref.watch(tokenProvider);
 
     setState(() => resendOtpLoading = true);
