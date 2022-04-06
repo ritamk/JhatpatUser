@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/database/database.dart';
@@ -25,17 +24,16 @@ class _ProfilePageState extends State<ProfilePage> {
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   final FocusNode _nameFocus = FocusNode();
   String _name = "";
-  late TextEditingController _nameController;
   final FocusNode _emailFocus = FocusNode();
   String _email = "";
-  late TextEditingController _emailController;
+  String _namePreValue = "";
+  String _emailPreValue = "";
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.userProfileData.name);
-    _emailController =
-        TextEditingController(text: widget.userProfileData.email);
+    _namePreValue = widget.userProfileData.name!;
+    _emailPreValue = widget.userProfileData.email!;
   }
 
   @override
@@ -52,33 +50,40 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                TextFormField(
-                  keyboardType: TextInputType.name,
-                  controller: _nameController,
-                  decoration:
-                      authTextInputDecoration("Name", Icons.person, null),
-                  style: const TextStyle(color: Colors.black, fontSize: 16.0),
-                  focusNode: _nameFocus,
-                  validator: (val) =>
-                      val != null ? nameValidator(val) : "Please add a name",
-                  onChanged: (val) => _name = val,
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (val) =>
-                      FocusScope.of(context).requestFocus(_emailFocus),
+                Card(
+                  shadowColor: Colors.black38,
+                  elevation: 6.0,
+                  child: TextFormField(
+                    keyboardType: TextInputType.name,
+                    decoration: authTextInputDecoration(
+                        "Name", Icons.person, null, _namePreValue),
+                    style: const TextStyle(color: Colors.black, fontSize: 16.0),
+                    focusNode: _nameFocus,
+                    validator: (val) =>
+                        val != null ? nameValidator(val) : "Please add a name",
+                    onChanged: (val) => _name = val,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (val) =>
+                        FocusScope.of(context).requestFocus(_emailFocus),
+                  ),
                 ),
                 const SizedBox(height: 10.0, width: 0.0),
-                TextFormField(
-                  keyboardType: TextInputType.emailAddress,
-                  controller: _emailController,
-                  decoration:
-                      authTextInputDecoration("Email", Icons.mail, null),
-                  style: const TextStyle(color: Colors.black, fontSize: 16.0),
-                  focusNode: _emailFocus,
-                  validator: (val) =>
-                      val != null ? emailValidator(val) : "Please add an email",
-                  onChanged: (val) => _email = val,
-                  textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
+                Card(
+                  shadowColor: Colors.black38,
+                  elevation: 6.0,
+                  child: TextFormField(
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: authTextInputDecoration(
+                        "Email", Icons.mail, null, _emailPreValue),
+                    style: const TextStyle(color: Colors.black, fontSize: 16.0),
+                    focusNode: _emailFocus,
+                    validator: (val) => val != null
+                        ? emailValidator(val)
+                        : "Please add an email",
+                    onChanged: (val) => _email = val,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
+                  ),
                 ),
                 const SizedBox(height: 20.0, width: 0.0),
                 Consumer(

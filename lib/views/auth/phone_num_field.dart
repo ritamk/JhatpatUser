@@ -26,15 +26,19 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
       key: _phNoGlobalKey,
       child: Column(
         children: <Widget>[
-          TextFormField(
-            decoration: authTextInputDecoration(
-                "Phone number", Icons.phone_android, "+91 "),
-            style: const TextStyle(color: Colors.black, fontSize: 16.0),
-            focusNode: _phoneFocusNode,
-            validator: validation,
-            onChanged: (val) => _phoneNum = val,
-            textInputAction: TextInputAction.done,
-            onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
+          Card(
+            shadowColor: Colors.black38,
+            elevation: 6.0,
+            child: TextFormField(
+              decoration: authTextInputDecoration(
+                  "Phone number", Icons.phone_android, "+91 ", null),
+              style: const TextStyle(color: Colors.black, fontSize: 16.0),
+              focusNode: _phoneFocusNode,
+              validator: validation,
+              onChanged: (val) => _phoneNum = val,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
+            ),
           ),
           const SizedBox(height: 20.0, width: 0.0),
           Consumer(builder: (context, ref, __) {

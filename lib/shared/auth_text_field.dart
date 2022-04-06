@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 InputDecoration authTextInputDecoration(
-    String label, IconData suffixIcon, String? preText) {
+    String label, IconData suffixIcon, String? preText, String? hintText) {
   return InputDecoration(
+    hintText: hintText,
     contentPadding: const EdgeInsets.all(20.0),
     fillColor: Colors.white,
     filled: true,

@@ -49,15 +49,20 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
             },
           ),
           const SizedBox(height: 30.0, width: 0.0),
-          TextFormField(
-            keyboardType: TextInputType.number,
-            decoration: authTextInputDecoration("4 digit OTP", Icons.lock, ""),
-            style: const TextStyle(color: Colors.black, fontSize: 16.0),
-            focusNode: _otpFocusNode,
-            validator: validation,
-            onChanged: (val) => _otp = val,
-            textInputAction: TextInputAction.done,
-            onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
+          Card(
+            shadowColor: Colors.black38,
+            elevation: 6.0,
+            child: TextFormField(
+              keyboardType: TextInputType.number,
+              decoration: authTextInputDecoration(
+                  "4 digit OTP", Icons.lock, null, null),
+              style: const TextStyle(color: Colors.black, fontSize: 16.0),
+              focusNode: _otpFocusNode,
+              validator: validation,
+              onChanged: (val) => _otp = val,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
+            ),
           ),
           const SizedBox(height: 5.0, width: 0.0),
           Align(
