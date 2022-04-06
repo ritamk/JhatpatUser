@@ -26,6 +26,12 @@ ThemeData customTheme() {
   return ThemeData(
     fontFamily: "Montserrat",
     appBarTheme: const AppBarTheme(
+      titleTextStyle: TextStyle(
+        fontSize: 22.0,
+        fontWeight: FontWeight.bold,
+        color: Colors.red,
+        fontFamily: "Montserrat",
+      ),
       centerTitle: true,
       elevation: 0.0,
       backgroundColor: Colors.transparent,
