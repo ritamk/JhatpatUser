@@ -7,11 +7,14 @@ class DatabaseService {
   DatabaseService({this.token});
   final String? token;
 
+  final String _sthWentWrong = "Something went wrong, please try again";
+
   final String _apiSite = "https://demo.karukatha.com/apis/";
   final String _postLogRegUrl = "login_register";
   final String _postOtpVerification = "verifyOtp";
   final String _getResendOtp = "resendOtp";
-  final String _updateCurrentLocation = "updateCurrentLocation";
+  final String _postUpdateLocation = "updateCurrentLocation";
+  final String _getUserDetails = "getUserProfileDetails";
 
   Future<UserLoginRegData?> postLoginRegister({String? phNum}) async {
     final Uri url = Uri.parse(_apiSite + _postLogRegUrl);
@@ -33,7 +36,7 @@ class DatabaseService {
           token: decodedResponse["data"]["token"],
         );
       } else {
-        return Future.error("Something went wrong, please try again");
+        return Future.error(_sthWentWrong);
       }
     } catch (e) {
       print("postLoginRegister: ${e.toString()}");
@@ -69,7 +72,10 @@ class DatabaseService {
   Future<bool> getResendOtp() async {
     final Uri url = Uri.parse(_apiSite + _getResendOtp);
     try {
-      Response response = await get(url, headers: {"user-token": token!});
+      Response response = await get(
+        url,
+        headers: {"user-token": token!},
+      );
       print(response.body);
       Map decodedResponse = jsonDecode(response.body);
       if (decodedResponse["success"] == "1") {
@@ -84,7 +90,7 @@ class DatabaseService {
   }
 
   Future<UserLocationData> postCurrentLocation(String lat, String lon) async {
-    final Uri url = Uri.parse(_apiSite + _updateCurrentLocation);
+    final Uri url = Uri.parse(_apiSite + _postUpdateLocation);
     try {
       Response response = await post(
         url,
@@ -104,10 +110,35 @@ class DatabaseService {
             lat: decodedResponse["data"]["lat"],
             lon: decodedResponse["data"]["lon"]);
       } else {
-        return Future.error("Something went wrong, please try again");
+        return Future.error(_sthWentWrong);
       }
     } catch (e) {
       print("postCurrentLocation: ${e.toString()}");
+      return Future.error(e.toString());
+    }
+  }
+
+  Future<UserProfileData?> getProfileDetails() async {
+    final Uri url = Uri.parse(_apiSite + _getUserDetails);
+    try {
+      Response response = await get(
+        url,
+        headers: {"user-token": token!},
+      );
+      print(response.body);
+      Map decodedResponse = jsonDecode(response.body);
+      if (decodedResponse["success"] == "1") {
+        return UserProfileData(
+          phone: decodedResponse["data"]["User_Profile_Details"]["user_phone"],
+          name: decodedResponse["data"]["User_Profile_Details"]["user_name"],
+          email: decodedResponse["data"]["User_Profile_Details"]["user_email"],
+          modified: decodedResponse["data"]["User_Profile_Details"]["modified"],
+        );
+      } else {
+        return Future.error(_sthWentWrong);
+      }
+    } catch (e) {
+      print("getProfileDetails: ${e.toString()}");
       return Future.error(e.toString());
     }
   }
