@@ -38,8 +38,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                           Navigator.of(context).pop();
                           Navigator.of(context).push(
                             CupertinoPageRoute(
-                              builder: (context) =>
-                                  const ProfilePage(profileCompleted: false),
+                              builder: (context) => ProfilePage(
+                                profileCompleted: false,
+                                userProfileData: widget.userProfileData,
+                              ),
                             ),
                           );
                         },
@@ -58,8 +60,14 @@ class _HomeDrawerState extends State<HomeDrawer> {
               Navigator.of(context).push(
                 CupertinoPageRoute(
                   builder: (context) => profileCompleted
-                      ? const ProfilePage(profileCompleted: true)
-                      : const ProfilePage(profileCompleted: false),
+                      ? ProfilePage(
+                          profileCompleted: true,
+                          userProfileData: widget.userProfileData,
+                        )
+                      : ProfilePage(
+                          profileCompleted: false,
+                          userProfileData: widget.userProfileData,
+                        ),
                 ),
               );
             },

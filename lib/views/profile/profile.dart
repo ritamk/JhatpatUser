@@ -11,10 +11,10 @@ import 'package:jhatpat/shared/snackbars.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage(
-      {Key? key, required this.profileCompleted, this.userProfileData})
+      {Key? key, required this.profileCompleted, required this.userProfileData})
       : super(key: key);
   final bool profileCompleted;
-  final UserProfileData? userProfileData;
+  final UserProfileData userProfileData;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -33,9 +33,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.userProfileData!.name);
+    _nameController = TextEditingController(text: widget.userProfileData.name);
     _emailController =
-        TextEditingController(text: widget.userProfileData!.email);
+        TextEditingController(text: widget.userProfileData.email);
   }
 
   @override
