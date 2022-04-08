@@ -26,14 +26,16 @@ class _ProfilePageState extends State<ProfilePage> {
   String _name = "";
   final FocusNode _emailFocus = FocusNode();
   String _email = "";
-  String _namePreValue = "";
-  String _emailPreValue = "";
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _namePreValue = widget.userProfileData.name!;
-    _emailPreValue = widget.userProfileData.email!;
+    _nameController.text = widget.userProfileData.name!;
+    _name = widget.userProfileData.name!;
+    _emailController.text = widget.userProfileData.email!;
+    _email = widget.userProfileData.email!;
   }
 
   @override
@@ -54,9 +56,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   shadowColor: Colors.black38,
                   elevation: 6.0,
                   child: TextFormField(
+                    controller: _nameController,
                     keyboardType: TextInputType.name,
                     decoration: authTextInputDecoration(
-                        "Name", Icons.person, null, _namePreValue),
+                        "Name", Icons.person, null, null),
                     style: const TextStyle(color: Colors.black, fontSize: 16.0),
                     focusNode: _nameFocus,
                     validator: (val) =>
@@ -72,9 +75,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   shadowColor: Colors.black38,
                   elevation: 6.0,
                   child: TextFormField(
+                    controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: authTextInputDecoration(
-                        "Email", Icons.mail, null, _emailPreValue),
+                        "Email", Icons.mail, null, null),
                     style: const TextStyle(color: Colors.black, fontSize: 16.0),
                     focusNode: _emailFocus,
                     validator: (val) => val != null
@@ -158,10 +162,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String? emailValidator(String val) {
+    const String emailRegExp =
+        r"^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$";
     if (val.isEmpty) {
       return "Please add an email";
     } else {
-      if (val.contains(RegExp(r"^[a-zA-Z0-9+.@]+$"))) {
+      if (RegExp(emailRegExp.toString(), caseSensitive: false).hasMatch(val)) {
         return null;
       } else {
         return "Please enter a proper email address";
