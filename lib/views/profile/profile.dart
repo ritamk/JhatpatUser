@@ -95,10 +95,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     return MaterialButton(
                       onPressed: () => updateButton(context, ref),
                       child: !loading
-                          ? const Text(
-                              "Update",
-                              style: TextStyle(fontSize: 16.0),
-                            )
+                          ? const Text("Update",
+                              style: TextStyle(fontSize: 16.0))
                           : const Loading(white: true),
                       minWidth: double.infinity,
                       elevation: 0.0,

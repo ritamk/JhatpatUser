@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jhatpat/models/user.dart';
+import 'package:jhatpat/services/shared_pref.dart';
+import 'package:jhatpat/shared/loading.dart';
+import 'package:jhatpat/shared/snackbars.dart';
 import 'package:jhatpat/views/profile/profile.dart';
+import 'package:jhatpat/wrapper.dart';
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer({Key? key, required this.userProfileData}) : super(key: key);
@@ -13,6 +17,7 @@ class HomeDrawer extends StatefulWidget {
 
 class _HomeDrawerState extends State<HomeDrawer> {
   late bool profileCompleted;
+  bool signingOut = false;
 
   @override
   void initState() {
@@ -27,13 +32,26 @@ class _HomeDrawerState extends State<HomeDrawer> {
         children: <Widget>[
           DrawerHeader(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const Text("Welcome\n",
-                    style: TextStyle(fontSize: 20.0, color: Colors.black54)),
                 profileCompleted
-                    ? Text(
-                        "${widget.userProfileData.name!}\n${widget.userProfileData.email!}")
+                    ? RichText(
+                        text: TextSpan(
+                          children: <InlineSpan>[
+                            TextSpan(
+                                text: "\n${widget.userProfileData.name!}",
+                                style: const TextStyle(
+                                    fontSize: 20.0,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text: "\n${widget.userProfileData.email!}",
+                                style: const TextStyle(color: Colors.black45)),
+                          ],
+                        ),
+                      )
                     : TextButton(
                         onPressed: () {
                           Navigator.of(context).pop();
@@ -73,10 +91,35 @@ class _HomeDrawerState extends State<HomeDrawer> {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.power_settings_new),
+            title: !signingOut
+                ? const Text("Sign-out")
+                : const Loading(white: false),
+            onTap: () => signOutMethod(),
+          ),
         ],
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(20.0), topLeft: Radius.circular(20.0))),
     );
+  }
+
+  void signOutMethod() async {
+    setState(() => signingOut = true);
+    try {
+      UserSharedPreferences.setLoggedInOrNot(false)
+          .whenComplete(() => UserSharedPreferences.setUserToken(""))
+          .whenComplete(() => UserSharedPreferences.setUserPhoneNum(""));
+      await Navigator.of(context).pushAndRemoveUntil(
+          CupertinoPageRoute(builder: (context) => const WrapperPage()),
+          (route) => false);
+    } catch (e) {
+      commonSnackbar(
+          "Something went wrong, couldn't properly sign-out", context);
+    }
+    setState(() => signingOut = false);
   }
 }
 

@@ -21,7 +21,12 @@ class UserSharedPreferences {
 
   static String? getUserToken() {
     try {
-      return sharedPreferences!.getString(_userTokenKey);
+      String? token = sharedPreferences!.getString(_userTokenKey);
+      return token != null
+          ? token.isEmpty
+              ? null
+              : token
+          : null;
     } catch (e) {
       return null;
     }
@@ -39,7 +44,12 @@ class UserSharedPreferences {
 
   static String? getUserPhoneNum() {
     try {
-      return sharedPreferences!.getString(_userPhoneNumKey);
+      String? num = sharedPreferences!.getString(_userPhoneNumKey);
+      return num != null
+          ? num.isEmpty
+              ? null
+              : num
+          : null;
     } catch (e) {
       return null;
     }
