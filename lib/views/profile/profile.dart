@@ -117,6 +117,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _nameFocus.dispose();
+    _emailController.dispose();
+    _emailFocus.dispose();
+    super.dispose();
+  }
+
   void updateButton(BuildContext context, WidgetRef ref) async {
     if (_globalKey.currentState!.validate()) {
       setState(() => loading = true);
