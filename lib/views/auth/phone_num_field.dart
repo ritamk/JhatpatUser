@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/database/database.dart';
-import 'package:jhatpat/shared/auth_text_field.dart';
+import 'package:jhatpat/shared/text_field_deco.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/shared/snackbars.dart';
@@ -31,7 +31,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
             elevation: 6.0,
             child: TextFormField(
               decoration: authTextInputDecoration(
-                  "Phone number", Icons.phone_android, "+91 ", null),
+                  "Phone number", Icons.phone_android, "+91 "),
               style: const TextStyle(color: Colors.black, fontSize: 16.0),
               focusNode: _phoneFocusNode,
               validator: validation,

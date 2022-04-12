@@ -32,8 +32,11 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
   @override
   void initState() {
     super.initState();
-    ref.watch(profileUpdated)
-        ? checkUserData().whenComplete(() => setState((() => loading = false)))
+    ref.read(profileUpdated)
+        ? checkUserData().whenComplete(() => setState((() {
+              loading = false;
+              ref.read(profileUpdated.state).state == false;
+            })))
         : setState(() => loading = false);
   }
 
@@ -92,6 +95,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                                             color: Colors.black45)),
                                   ],
                                 ),
+                                textAlign: TextAlign.center,
                               )
                             else
                               TextButton(

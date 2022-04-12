@@ -4,7 +4,7 @@ import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/services/shared_pref.dart';
-import 'package:jhatpat/shared/auth_text_field.dart';
+import 'package:jhatpat/shared/text_field_deco.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
 
@@ -58,8 +58,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: TextFormField(
                     controller: _nameController,
                     keyboardType: TextInputType.name,
-                    decoration: authTextInputDecoration(
-                        "Name", Icons.person, null, null),
+                    decoration:
+                        authTextInputDecoration("Name", Icons.person, null),
                     style: const TextStyle(color: Colors.black, fontSize: 16.0),
                     focusNode: _nameFocus,
                     validator: (val) =>
@@ -77,8 +77,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: authTextInputDecoration(
-                        "Email", Icons.mail, null, null),
+                    decoration:
+                        authTextInputDecoration("Email", Icons.mail, null),
                     style: const TextStyle(color: Colors.black, fontSize: 16.0),
                     focusNode: _emailFocus,
                     validator: (val) => val != null

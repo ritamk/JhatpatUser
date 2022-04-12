@@ -10,7 +10,5 @@ final otpScreenBoolProvider = StateProvider<bool>((ref) => false);
 /// Stores token returned from the initial login/register API.
 final tokenProvider = StateProvider<String?>((ref) => null);
 
-/// Used to tell the Home page after the closing of the
-/// drawer that the profile has been updated and
-/// that the data needs to be reloaded.
+/// Used to help the drawer know when profile has been updated.
 final profileUpdated = StateProvider<bool>((ref) => true);

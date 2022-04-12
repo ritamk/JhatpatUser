@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
-import 'package:jhatpat/shared/auth_text_field.dart';
+import 'package:jhatpat/shared/text_field_deco.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/shared/snackbars.dart';
@@ -54,8 +54,8 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
             elevation: 6.0,
             child: TextFormField(
               keyboardType: TextInputType.number,
-              decoration: authTextInputDecoration(
-                  "4 digit OTP", Icons.lock, null, null),
+              decoration:
+                  authTextInputDecoration("4 digit OTP", Icons.lock, null),
               style: const TextStyle(color: Colors.black, fontSize: 16.0),
               focusNode: _otpFocusNode,
               validator: validation,

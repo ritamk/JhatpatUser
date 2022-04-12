@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jhatpat/shared/text_field_deco.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
 import 'package:jhatpat/views/home/home_drawer.dart';
@@ -54,10 +55,11 @@ class _HomePageState extends ConsumerState<HomePage> {
         MarkerId(destination ? _destMarkerId : _myMarkerId);
 
     final Marker marker = Marker(
-        markerId: markerId,
-        position: coordinate,
-        icon: BitmapDescriptor.defaultMarkerWithHue(
-            destination ? BitmapDescriptor.hueBlue : BitmapDescriptor.hueRed));
+      markerId: markerId,
+      position: coordinate,
+      icon: BitmapDescriptor.defaultMarkerWithHue(
+          destination ? BitmapDescriptor.hueBlue : BitmapDescriptor.hueRed),
+    );
 
     setState(() => markers[markerId] = marker);
   }
@@ -65,23 +67,39 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          elevation: 2.0,
-          title: const Text("Home"),
-          backgroundColor: Colors.white,
-        ),
-        body: GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: _initCamPos,
-          onMapCreated: (GoogleMapController controller) =>
-              _controller = controller,
-          zoomControlsEnabled: false,
-          compassEnabled: true,
-          myLocationButtonEnabled: false,
-          onLongPress: (LatLng latLng) {
-            addMarker(true, latLng);
-          },
-          markers: Set<Marker>.of(markers.values),
+        // appBar: AppBar(
+        //   elevation: 2.0,
+        //   title: const Text("Home"),
+        //   // title: TextField(
+        //   //   decoration: authTextInputDecoration(
+        //   //       "Search for a place", Icons.search, null),
+
+        //   // ),
+        //   backgroundColor: Colors.white,
+        // ),
+        body: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                title: Text("Home"),
+              ),
+              GoogleMap(
+                mapType: MapType.normal,
+                initialCameraPosition: _initCamPos,
+                onMapCreated: (GoogleMapController controller) =>
+                    _controller = controller,
+                zoomControlsEnabled: false,
+                compassEnabled: true,
+                myLocationButtonEnabled: false,
+                myLocationEnabled: true,
+                onLongPress: (LatLng latLng) {
+                  addMarker(true, latLng);
+                },
+                markers: Set<Marker>.of(markers.values),
+              ),
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.red,
@@ -130,3 +148,19 @@ Future<Position?> determinePosition() async {
     return Geolocator.getLastKnownPosition();
   }
 }
+
+  // late BitmapDescriptor pickupIcon;
+  // late BitmapDescriptor dropoffIcon;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   BitmapDescriptor.fromAssetImage(
+  //           const ImageConfiguration(size: Size(20.0, 20.0)),
+  //           "assets/images/MapIconPickup.png")
+  //       .then((value) => pickupIcon = value);
+  //   BitmapDescriptor.fromAssetImage(
+  //           const ImageConfiguration(size: Size(20.0, 20.0)),
+  //           "assets/images/MapIconDropoff.png")
+  //       .then((value) => dropoffIcon = value);
+  // }
