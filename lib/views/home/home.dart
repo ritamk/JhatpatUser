@@ -1,18 +1,16 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart' as pl;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_api_headers/google_api_headers.dart';
+import 'package:google_directions_api/google_directions_api.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
 import 'package:jhatpat/shared/text_field_deco.dart';
 import 'package:jhatpat/views/home/home_drawer.dart';
+import 'package:jhatpat/views/home/location_services.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,6 +20,7 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  bool _routeLoading = false;
   bool _mapLoading = true;
   bool _myLocLoading = false;
   late GoogleMapController _controller;
@@ -29,10 +28,17 @@ class _HomePageState extends ConsumerState<HomePage> {
   Position? coord;
   late CameraPosition currentPosn;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  final String _polyLineRouteId = "polyRoute";
   final String _destMarkerId = "DestinationMarker";
+  LatLng? _pickupLatLng;
   final String _myMarkerId = "PickupMarker";
+  LatLng? _dropoffLatLng;
   String _searchString = "";
   late CameraPosition _initCamPos;
+  Map<PolylineId, Polyline> polylines = {};
+  List<LatLng> polylineCoordinates = [];
+  pl.PolylinePoints polylinePoints = pl.PolylinePoints();
+  final DirectionsService directionsService = DirectionsService();
 
   @override
   void initState() {
@@ -98,7 +104,56 @@ class _HomePageState extends ConsumerState<HomePage> {
       null;
     }
 
-    setState(() => markers[markerId] = marker);
+    setState(() {
+      markers[markerId] = marker;
+      if (destination) {
+        _dropoffLatLng = coordinate;
+      } else {
+        _pickupLatLng = coordinate;
+      }
+    });
+  }
+
+  void _addPolyLine() {
+    PolylineId id = PolylineId(_polyLineRouteId);
+    Polyline polyline = Polyline(
+        polylineId: id, color: Colors.red, points: polylineCoordinates);
+    polylines[id] = polyline;
+    setState(() {});
+  }
+
+  void _getPolyline() async {
+    if (_dropoffLatLng != null && _pickupLatLng != null) {
+      pl.PolylineResult? result;
+      try {
+        try {
+          result = await polylinePoints.getRouteBetweenCoordinates(
+              API_KEY,
+              pl.PointLatLng(_pickupLatLng!.latitude, _pickupLatLng!.longitude),
+              pl.PointLatLng(
+                  _dropoffLatLng!.latitude, _dropoffLatLng!.longitude),
+              travelMode: pl.TravelMode.driving,
+              wayPoints: [
+                pl.PolylineWayPoint(location: "Route")
+              ]).whenComplete(() => setState(() => _routeLoading = false));
+        } catch (e) {
+          print(e.toString);
+        }
+        if (result!.points.isNotEmpty) {
+          print("not empty");
+          for (var point in result.points) {
+            polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+          }
+        } else {
+          print("empty");
+        }
+        _addPolyLine();
+      } catch (e) {
+        print(e.toString());
+      }
+    } else {
+      null;
+    }
   }
 
   @override
@@ -115,16 +170,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                   val != null ? _searchString = val : null;
                 },
                 textInputAction: TextInputAction.search,
-                // onEditingComplete: () async {
-                //   var place = await PlacesAutocomplete.show(
-                //     context: context,
-                //     apiKey: API_KEY,
-                //     mode: Mode.fullscreen,
-                //     types: [],
-                //     strictbounds: false,
-                //     onError: (e) => commonSnackbar(e.toString(), context),
-                //   );
-                // },
               ),
               backgroundColor: Colors.white,
             ),
@@ -146,6 +191,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               myLocationButtonEnabled: false,
               myLocationEnabled: true,
               compassEnabled: true,
+              polylines: Set<Polyline>.of(polylines.values),
             ),
             floatingActionButton: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -153,16 +199,26 @@ class _HomePageState extends ConsumerState<HomePage> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 FloatingActionButton(
-                  heroTag: "btn1",
-                  backgroundColor: Colors.black54.withOpacity(1.0),
+                  heroTag: "btn3",
+                  backgroundColor: Colors.black,
+                  onPressed: _getPolyline,
+                  child: !_routeLoading
+                      ? const Icon(Icons.navigation_rounded)
+                      : const Loading(white: true),
+                  tooltip: "Find Route",
+                ),
+                const SizedBox(height: 10.0, width: 0.0),
+                FloatingActionButton(
+                  heroTag: "btn2",
+                  backgroundColor: Colors.black,
                   onPressed: _turnCompassNorth,
                   child: const Icon(Icons.north),
                   tooltip: "North",
                 ),
                 const SizedBox(height: 10.0, width: 0.0),
                 FloatingActionButton(
-                  heroTag: "btn2",
-                  backgroundColor: Colors.black54.withOpacity(1.0),
+                  heroTag: "btn1",
+                  backgroundColor: Colors.black,
                   onPressed: _goToCurrLocation,
                   child: !_myLocLoading
                       ? const Icon(Icons.my_location_rounded)
@@ -173,42 +229,14 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             drawer: const HomeDrawer(),
           )
-        : const Scaffold(body: Loading(white: false, rad: 14.0));
+        : const Scaffold(
+            body: Loading(white: false, rad: 14.0),
+          );
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-}
-
-Future<Position?> determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error('Please enable location services.');
-  }
-
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      return Future.error('Please allow location permissions.');
-    }
-  }
-
-  if (permission == LocationPermission.deniedForever) {
-    return Future.error(
-        'Cannot request permissions, location permissions are permanently denied.');
-  }
-
-  try {
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best);
-  } catch (e) {
-    return Geolocator.getLastKnownPosition();
   }
 }

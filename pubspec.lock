@@ -71,6 +71,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.2"
+  flinq:
+    dependency: transitive
+    description:
+      name: flinq
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -184,6 +191,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
+  google_directions_api:
+    dependency: "direct main"
+    description:
+      name: google_directions_api
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.9.1"
   google_maps_flutter:
     dependency: "direct main"
     description:
@@ -199,12 +213,19 @@ packages:
     source: hosted
     version: "2.1.5"
   google_maps_webservice:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: google_maps_webservice
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.20-nullsafety.5"
+  google_polyline_algorithm:
+    dependency: transitive
+    description:
+      name: google_polyline_algorithm
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.1.0"
   http:
     dependency: "direct main"
     description:
