@@ -11,7 +11,7 @@ class DatabaseService {
 
   final String _sthWentWrong = "Something went wrong, please try again";
 
-  final String _apiSite = "https://demo.karukatha.com/apis/";
+  final String _baseUrl = "https://demo.karukatha.com/apis/";
   final String _postLogRegUrl = "login_register";
   final String _postOtpVerification = "verifyOtp";
   final String _getResendOtp = "resendOtp";
@@ -20,7 +20,7 @@ class DatabaseService {
   final String _postUserDetails = "updateUserDetails";
 
   Future<UserLoginRegData?> postLoginRegister({String? phNum}) async {
-    final Uri url = Uri.parse(_apiSite + _postLogRegUrl);
+    final Uri url = Uri.parse(_baseUrl + _postLogRegUrl);
     try {
       Response response = await post(
         url,
@@ -48,7 +48,7 @@ class DatabaseService {
   }
 
   Future<bool> postVerifyOtp(String otp) async {
-    final Uri url = Uri.parse(_apiSite + _postOtpVerification);
+    final Uri url = Uri.parse(_baseUrl + _postOtpVerification);
     try {
       Response response = await post(
         url,
@@ -73,7 +73,7 @@ class DatabaseService {
   }
 
   Future<bool> getResendOtp() async {
-    final Uri url = Uri.parse(_apiSite + _getResendOtp);
+    final Uri url = Uri.parse(_baseUrl + _getResendOtp);
     try {
       Response response = await get(
         url,
@@ -93,7 +93,7 @@ class DatabaseService {
   }
 
   Future<UserLocationData> postCurrentLocation(String lat, String lon) async {
-    final Uri url = Uri.parse(_apiSite + _postUpdateLocation);
+    final Uri url = Uri.parse(_baseUrl + _postUpdateLocation);
     try {
       Response response = await post(
         url,
@@ -122,7 +122,7 @@ class DatabaseService {
   }
 
   Future<UserProfileData?> getProfileDetails() async {
-    final Uri url = Uri.parse(_apiSite + _getUserDetails);
+    final Uri url = Uri.parse(_baseUrl + _getUserDetails);
     try {
       Response response = await get(
         url,
@@ -148,7 +148,7 @@ class DatabaseService {
 
   Future<bool> postUserDetails(
       String name, String email, String phNum, bool edit) async {
-    final Uri url = Uri.parse(_apiSite + _postUserDetails);
+    final Uri url = Uri.parse(_baseUrl + _postUserDetails);
     try {
       Response response = await post(
         url,
