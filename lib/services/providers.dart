@@ -13,4 +13,4 @@ final tokenProvider = StateProvider<String?>((ref) => null);
 /// Used to tell the Home page after the closing of the
 /// drawer that the profile has been updated and
 /// that the data needs to be reloaded.
-final profileUpdated = StateProvider<bool>((ref) => false);
+final profileUpdated = StateProvider<bool>((ref) => true);
