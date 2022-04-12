@@ -5,6 +5,7 @@ class UserSharedPreferences {
   static const String _userTokenKey = "userTokenKey";
   static const String _userPhoneNumKey = "userPhoneNumKey";
   static const String _loggedInKey = "loggedInKey";
+  static const String _mapGeoLocKey = "mapgeolocKey";
 
   static Future init() async =>
       sharedPreferences = await SharedPreferences.getInstance();
@@ -70,6 +71,29 @@ class UserSharedPreferences {
       return sharedPreferences!.getBool(_loggedInKey) ?? false;
     } catch (e) {
       return false;
+    }
+  }
+
+  static Future setMapGeoLoc(double lat, double long) async {
+    try {
+      await sharedPreferences!
+          .setStringList(_mapGeoLocKey, [lat.toString(), long.toString()]);
+    } catch (e) {
+      print("setMapGeoLoc: ${e.toString()}");
+      Future.error("Something went wrong while"
+          "\nsaving user data on device");
+    }
+  }
+
+  static List<double?> getMapGeoLoc() {
+    try {
+      return [
+        double.tryParse(sharedPreferences!.getStringList(_mapGeoLocKey)![0]),
+        double.tryParse(sharedPreferences!.getStringList(_mapGeoLocKey)![1])
+      ];
+    } catch (e) {
+      print("getMapGeoLoc: ${e.toString()}");
+      return [];
     }
   }
 }

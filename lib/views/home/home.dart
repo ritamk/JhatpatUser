@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
 import 'package:jhatpat/shared/text_field_deco.dart';
@@ -17,20 +18,37 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  bool _mapLoading = true;
   bool _myLocLoading = false;
-
   late GoogleMapController _controller;
-  static const LatLng initCoord = LatLng(22.580597, 88.4223668);
+  late LatLng _initCoord;
   Position? coord;
-  LatLng currentPosn = initCoord;
+  late CameraPosition currentPosn;
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   final String _destMarkerId = "DestinationMarker";
   final String _myMarkerId = "PickupMarker";
+  String? _searchString = "";
+  late CameraPosition _initCamPos;
 
-  static const CameraPosition _initCamPos = CameraPosition(
-    target: initCoord,
-    zoom: 14,
-  );
+  @override
+  void initState() {
+    super.initState();
+    setInitCameraPos();
+  }
+
+  void setInitCameraPos() {
+    List<double?> initSavedCoord = UserSharedPreferences.getMapGeoLoc();
+    _initCoord = initSavedCoord.isEmpty
+        ? const LatLng(22.580597, 88.4223668)
+        : LatLng(initSavedCoord[0]!, initSavedCoord[1]!);
+    _initCamPos = CameraPosition(
+      target: _initCoord,
+      bearing: 0.0,
+      tilt: 0.0,
+      zoom: 14,
+    );
+    setState(() => _mapLoading = false);
+  }
 
   void _goToCurrLocation() async {
     setState(() => _myLocLoading = true);
@@ -42,6 +60,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (coord != null) {
       _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         target: LatLng(coord!.latitude, coord!.longitude),
+        bearing: 0.0,
+        tilt: 0.0,
         zoom: 19.0,
       )));
       addMarker(false, LatLng(coord!.latitude, coord!.longitude));
@@ -52,11 +72,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void _turnCompassNorth() {
-    _controller.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: currentPosn, bearing: 0.0)));
+    _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: currentPosn.target, bearing: 0.0, zoom: currentPosn.zoom)));
   }
 
-  void addMarker(bool destination, LatLng coordinate) {
+  void addMarker(bool destination, LatLng coordinate) async {
     final MarkerId markerId =
         MarkerId(destination ? _destMarkerId : _myMarkerId);
 
@@ -67,60 +87,76 @@ class _HomePageState extends ConsumerState<HomePage> {
           destination ? BitmapDescriptor.hueBlue : BitmapDescriptor.hueRed),
     );
 
+    try {
+      await UserSharedPreferences.setMapGeoLoc(
+          coordinate.latitude, coordinate.longitude);
+    } catch (e) {
+      null;
+    }
+
     setState(() => markers[markerId] = marker);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          elevation: 2.0,
-          // title: const Text("Home"),
-          title: TextField(
-            decoration: searchTextInputDecoration(
-                "Search for a place", Icons.search, null),
-          ),
-          backgroundColor: Colors.white,
-        ),
-        body: GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: _initCamPos,
-          onMapCreated: (GoogleMapController controller) =>
-              _controller = controller,
-          compassEnabled: false,
-          zoomControlsEnabled: false,
-          myLocationButtonEnabled: false,
-          myLocationEnabled: true,
-          onLongPress: (LatLng latLng) {
-            addMarker(true, latLng);
-          },
-          onTap: (LatLng latLng) =>
-              FocusManager.instance.primaryFocus?.unfocus(),
-          onCameraMove: (CameraPosition cameraPosn) =>
-              currentPosn = cameraPosn.target,
-          markers: Set<Marker>.of(markers.values),
-        ),
-        floatingActionButton: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            FloatingActionButton(
-              backgroundColor: Colors.red,
-              onPressed: _turnCompassNorth,
-              child: const Icon(Icons.explore),
-              tooltip: "Turn North",
+    return !_mapLoading
+        ? Scaffold(
+            appBar: AppBar(
+              elevation: 2.0,
+              // title: const Text("Home"),
+              title: TextField(
+                decoration: searchTextInputDecoration(
+                    "Search for a place", Icons.search, null),
+                onChanged: (String? val) {
+                  val != null ? _searchString = val : null;
+                },
+              ),
+              backgroundColor: Colors.white,
             ),
-            FloatingActionButton(
-              backgroundColor: Colors.red,
-              onPressed: _goToCurrLocation,
-              child: !_myLocLoading
-                  ? const Icon(Icons.my_location_rounded)
-                  : const Loading(white: true),
-              tooltip: "Current Location",
+            body: GoogleMap(
+              mapType: MapType.terrain,
+              initialCameraPosition: _initCamPos,
+              onMapCreated: (GoogleMapController controller) =>
+                  _controller = controller,
+              onLongPress: (LatLng latLng) {
+                addMarker(true, latLng);
+              },
+              onTap: (LatLng latLng) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
+              onCameraMove: (CameraPosition cameraPosn) =>
+                  currentPosn = cameraPosn,
+              markers: Set<Marker>.of(markers.values),
+              mapToolbarEnabled: false,
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: false,
+              myLocationEnabled: true,
+              compassEnabled: true,
             ),
-          ],
-        ),
-        drawer: const HomeDrawer());
+            floatingActionButton: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                FloatingActionButton(
+                  backgroundColor: Colors.black54,
+                  onPressed: _turnCompassNorth,
+                  child: const Icon(Icons.navigation_rounded),
+                  tooltip: "North",
+                ),
+                const SizedBox(height: 10.0, width: 0.0),
+                FloatingActionButton(
+                  backgroundColor: Colors.black54,
+                  onPressed: _goToCurrLocation,
+                  child: !_myLocLoading
+                      ? const Icon(Icons.my_location_rounded)
+                      : const Loading(white: true),
+                  tooltip: "Current Location",
+                ),
+              ],
+            ),
+            drawer: const HomeDrawer(),
+          )
+        : const Loading(white: false, rad: 14.0);
   }
 
   @override
