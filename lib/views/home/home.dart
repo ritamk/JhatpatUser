@@ -114,7 +114,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
-  void _addPolyLine() {
+  void addPolyLine() {
     PolylineId id = PolylineId(_polyLineRouteId);
     Polyline polyline = Polyline(
         polylineId: id, color: Colors.red, points: polylineCoordinates);
@@ -122,32 +122,24 @@ class _HomePageState extends ConsumerState<HomePage> {
     setState(() {});
   }
 
-  void _getPolyline() async {
+  void getPolyline() async {
     if (_dropoffLatLng != null && _pickupLatLng != null) {
       pl.PolylineResult? result;
       try {
-        try {
-          result = await polylinePoints.getRouteBetweenCoordinates(
-              API_KEY,
-              pl.PointLatLng(_pickupLatLng!.latitude, _pickupLatLng!.longitude),
-              pl.PointLatLng(
-                  _dropoffLatLng!.latitude, _dropoffLatLng!.longitude),
-              travelMode: pl.TravelMode.driving,
-              wayPoints: [
-                pl.PolylineWayPoint(location: "Route")
-              ]).whenComplete(() => setState(() => _routeLoading = false));
-        } catch (e) {
-          print(e.toString);
-        }
-        if (result!.points.isNotEmpty) {
-          print("not empty");
+        result = await polylinePoints.getRouteBetweenCoordinates(
+            API_KEY,
+            pl.PointLatLng(_pickupLatLng!.latitude, _pickupLatLng!.longitude),
+            pl.PointLatLng(_dropoffLatLng!.latitude, _dropoffLatLng!.longitude),
+            travelMode: pl.TravelMode.driving,
+            wayPoints: [
+              pl.PolylineWayPoint(location: "Route")
+            ]).whenComplete(() => setState(() => _routeLoading = false));
+        if (result.points.isNotEmpty) {
           for (var point in result.points) {
             polylineCoordinates.add(LatLng(point.latitude, point.longitude));
           }
-        } else {
-          print("empty");
         }
-        _addPolyLine();
+        addPolyLine();
       } catch (e) {
         print(e.toString());
       }
@@ -201,7 +193,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 FloatingActionButton(
                   heroTag: "btn3",
                   backgroundColor: Colors.black,
-                  onPressed: _getPolyline,
+                  onPressed: getPolyline,
                   child: !_routeLoading
                       ? const Icon(Icons.navigation_rounded)
                       : const Loading(white: true),
