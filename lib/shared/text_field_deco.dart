@@ -10,9 +10,9 @@ InputDecoration authTextInputDecoration(
     prefixText: preText,
     labelText: label,
     floatingLabelBehavior: FloatingLabelBehavior.never,
-    border: textFieldBorder(5.0),
-    focusedBorder: textFieldBorder(5.0),
-    errorBorder: textFieldBorder(5.0),
+    border: textFieldBorder(false, 5.0),
+    focusedBorder: textFieldBorder(false, 5.0),
+    errorBorder: textFieldBorder(false, 5.0),
     errorStyle: const TextStyle(color: Color.fromRGBO(223, 92, 82, 1.0)),
   );
 }
@@ -27,15 +27,17 @@ InputDecoration searchTextInputDecoration(
     prefixText: preText,
     labelText: label,
     floatingLabelBehavior: FloatingLabelBehavior.never,
-    border: textFieldBorder(30.0),
-    focusedBorder: textFieldBorder(35.0),
-    errorBorder: textFieldBorder(30.0),
+    border: textFieldBorder(true, 30.0),
+    focusedBorder: textFieldBorder(true, 35.0),
+    errorBorder: textFieldBorder(true, 30.0),
     errorStyle: const TextStyle(color: Color.fromRGBO(223, 92, 82, 1.0)),
   );
 }
 
-OutlineInputBorder textFieldBorder(double rad) {
+OutlineInputBorder textFieldBorder(bool border, double rad) {
   return OutlineInputBorder(
+    // borderSide: border ? const BorderSide(width: 0.5) : BorderSide.none,
+    borderSide: BorderSide.none,
     borderRadius: BorderRadius.circular(rad),
   );
 }
