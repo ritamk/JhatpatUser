@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
+import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
@@ -27,7 +31,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   final String _destMarkerId = "DestinationMarker";
   final String _myMarkerId = "PickupMarker";
-  String? _searchString = "";
+  String _searchString = "";
   late CameraPosition _initCamPos;
 
   @override
@@ -102,7 +106,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return !_mapLoading
         ? Scaffold(
             appBar: AppBar(
-              elevation: 2.0,
+              elevation: 3.0,
               // title: const Text("Home"),
               title: TextField(
                 decoration: searchTextInputDecoration(
@@ -110,6 +114,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                 onChanged: (String? val) {
                   val != null ? _searchString = val : null;
                 },
+                textInputAction: TextInputAction.search,
+                // onEditingComplete: () async {
+                //   var place = await PlacesAutocomplete.show(
+                //     context: context,
+                //     apiKey: API_KEY,
+                //     mode: Mode.fullscreen,
+                //     types: [],
+                //     strictbounds: false,
+                //     onError: (e) => commonSnackbar(e.toString(), context),
+                //   );
+                // },
               ),
               backgroundColor: Colors.white,
             ),
@@ -138,14 +153,16 @@ class _HomePageState extends ConsumerState<HomePage> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 FloatingActionButton(
-                  backgroundColor: Colors.black54,
+                  heroTag: "btn1",
+                  backgroundColor: Colors.black54.withOpacity(1.0),
                   onPressed: _turnCompassNorth,
-                  child: const Icon(Icons.navigation_rounded),
+                  child: const Icon(Icons.north),
                   tooltip: "North",
                 ),
                 const SizedBox(height: 10.0, width: 0.0),
                 FloatingActionButton(
-                  backgroundColor: Colors.black54,
+                  heroTag: "btn2",
+                  backgroundColor: Colors.black54.withOpacity(1.0),
                   onPressed: _goToCurrLocation,
                   child: !_myLocLoading
                       ? const Icon(Icons.my_location_rounded)
@@ -156,7 +173,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             drawer: const HomeDrawer(),
           )
-        : const Loading(white: false, rad: 14.0);
+        : const Scaffold(body: Loading(white: false, rad: 14.0));
   }
 
   @override
@@ -195,19 +212,3 @@ Future<Position?> determinePosition() async {
     return Geolocator.getLastKnownPosition();
   }
 }
-
-  // late BitmapDescriptor pickupIcon;
-  // late BitmapDescriptor dropoffIcon;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   BitmapDescriptor.fromAssetImage(
-  //           const ImageConfiguration(size: Size(20.0, 20.0)),
-  //           "assets/images/MapIconPickup.png")
-  //       .then((value) => pickupIcon = value);
-  //   BitmapDescriptor.fromAssetImage(
-  //           const ImageConfiguration(size: Size(20.0, 20.0)),
-  //           "assets/images/MapIconDropoff.png")
-  //       .then((value) => dropoffIcon = value);
-  // }

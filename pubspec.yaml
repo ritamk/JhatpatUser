@@ -41,6 +41,8 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   flutter_google_places_hoc081098: ^1.0.1
   geocoding: ^2.0.4
+  google_maps_webservice: ^0.0.20-nullsafety.5
+  google_api_headers: ^1.2.0
   # flutter_launcher_icons: ^0.9.2
 
 dev_dependencies:

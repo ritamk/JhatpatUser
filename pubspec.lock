@@ -178,7 +178,7 @@ packages:
     source: hosted
     version: "0.1.0"
   google_api_headers:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: google_api_headers
       url: "https://pub.dartlang.org"
@@ -199,7 +199,7 @@ packages:
     source: hosted
     version: "2.1.5"
   google_maps_webservice:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: google_maps_webservice
       url: "https://pub.dartlang.org"
