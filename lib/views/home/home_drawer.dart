@@ -4,7 +4,12 @@ import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
+import 'package:jhatpat/views/history/history.dart';
+import 'package:jhatpat/views/payment/payment.dart';
+import 'package:jhatpat/views/profile/address.dart';
 import 'package:jhatpat/views/profile/profile.dart';
+import 'package:jhatpat/views/settings/settings.dart';
+import 'package:jhatpat/views/support/support.dart';
 import 'package:jhatpat/wrapper.dart';
 
 class HomeDrawer extends StatefulWidget {
@@ -34,41 +39,47 @@ class _HomeDrawerState extends State<HomeDrawer> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                profileCompleted
-                    ? RichText(
-                        text: TextSpan(
-                          children: <InlineSpan>[
-                            TextSpan(
-                                text: "\n${widget.userProfileData.name!}",
-                                style: const TextStyle(
-                                    fontSize: 20.0,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold)),
-                            TextSpan(
-                                text: "\n${widget.userProfileData.email!}",
-                                style: const TextStyle(color: Colors.black45)),
-                          ],
+                CircleAvatar(
+                  maxRadius: 40.0,
+                  backgroundImage:
+                      Image.asset("assets/images/UserProfileDefault.png").image,
+                ),
+                if (profileCompleted)
+                  RichText(
+                    text: TextSpan(
+                      children: <InlineSpan>[
+                        TextSpan(
+                            text: "\n${widget.userProfileData.name!}",
+                            style: const TextStyle(
+                                fontSize: 20.0,
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold)),
+                        TextSpan(
+                            text: "\n${widget.userProfileData.email!}",
+                            style: const TextStyle(color: Colors.black45)),
+                      ],
+                    ),
+                  )
+                else
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => ProfilePage(
+                            profileCompleted: false,
+                            userProfileData: widget.userProfileData,
+                          ),
                         ),
-                      )
-                    : TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).push(
-                            CupertinoPageRoute(
-                              builder: (context) => ProfilePage(
-                                profileCompleted: false,
-                                userProfileData: widget.userProfileData,
-                              ),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          "Complete your profile",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
+                      );
+                    },
+                    child: const Text(
+                      "Complete your profile",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -92,9 +103,64 @@ class _HomeDrawerState extends State<HomeDrawer> {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.payment),
+            title: const Text("Payment Methods"),
+            onTap: () {
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                    builder: (context) => const PaymentMethodsPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text("History"),
+            onTap: () {
+              Navigator.of(context).push(
+                CupertinoPageRoute(builder: (context) => const HistoryPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.local_offer),
+            title: const Text("Apply promo code"),
+            onTap: () {
+              // Navigator.of(context).push(
+              //   CupertinoPageRoute(builder: (context) => ),
+              // );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text("My Addresses"),
+            onTap: () {
+              Navigator.of(context).push(
+                CupertinoPageRoute(builder: (context) => const AddressPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text("Settings"),
+            onTap: () {
+              Navigator.of(context).push(
+                CupertinoPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.support_agent),
+            title: const Text("Online Support"),
+            onTap: () {
+              Navigator.of(context).push(
+                CupertinoPageRoute(builder: (context) => const SupportPage()),
+              );
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.power_settings_new),
             title: !signingOut
-                ? const Text("Sign-out")
+                ? const Text("Log Out")
                 : const Loading(white: false),
             onTap: () => signOutMethod(),
           ),

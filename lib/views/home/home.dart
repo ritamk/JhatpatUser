@@ -8,7 +8,6 @@ import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/services/shared_pref.dart';
-import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
 import 'package:jhatpat/views/home/home_drawer.dart';
 
@@ -26,7 +25,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   UserProfileData? userProfileData;
 
   late GoogleMapController _controller;
+  static const LatLng initCoord = LatLng(22.580597, 88.4223668);
   Position? coord;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  final String _destMarkerId = "DestinationMarker";
+  final String _myMarkerId = "CurrLocationMarker";
 
   @override
   void initState() {
@@ -56,8 +59,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(22.580597, 88.4223668),
+  static const CameraPosition _initCamPos = CameraPosition(
+    target: initCoord,
     zoom: 14.4746,
   );
 
@@ -67,20 +70,37 @@ class _HomePageState extends ConsumerState<HomePage> {
     } catch (e) {
       commonSnackbar(e.toString(), context);
     }
-    coord != null
-        ? _controller
-            .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-            target: LatLng(coord!.latitude, coord!.longitude),
-            zoom: 19.0,
-          )))
-        : commonSnackbar("Cannot access current location", context);
+    if (coord != null) {
+      _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: LatLng(coord!.latitude, coord!.longitude),
+        zoom: 19.0,
+      )));
+      addMarker(false, LatLng(coord!.latitude, coord!.longitude));
+    } else {
+      commonSnackbar("Cannot access current location", context);
+    }
+  }
+
+  void addMarker(bool destination, LatLng coordinate) {
+    final MarkerId markerId =
+        MarkerId(destination ? _destMarkerId : _myMarkerId);
+
+    final Marker marker = Marker(
+        markerId: markerId,
+        position: coordinate,
+        icon: BitmapDescriptor.defaultMarkerWithHue(
+            destination ? BitmapDescriptor.hueBlue : BitmapDescriptor.hueRed));
+
+    setState(() => markers[markerId] = marker);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 2.0,
         title: const Text("Home"),
+        backgroundColor: Colors.white,
       ),
       // body: Center(
       //   child: !loading
@@ -91,11 +111,16 @@ class _HomePageState extends ConsumerState<HomePage> {
       // ),
       body: GoogleMap(
         mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
+        initialCameraPosition: _initCamPos,
         onMapCreated: (GoogleMapController controller) =>
             _controller = controller,
         zoomControlsEnabled: false,
         compassEnabled: true,
+        myLocationButtonEnabled: false,
+        onLongPress: (LatLng latLng) {
+          addMarker(true, latLng);
+        },
+        markers: Set<Marker>.of(markers.values),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _goToCurrLocation,
