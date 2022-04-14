@@ -50,7 +50,130 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     setInitCameraPos();
-    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_mapLoading) {
+      return Scaffold(
+        appBar: _showTextFields
+            ? AppBar(
+                toolbarHeight: 120.0,
+                elevation: 3.0,
+                title: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextFormField(
+                                  decoration: searchTextInputDecoration(
+                                      "Enter origin",
+                                      Icons.location_on_rounded,
+                                      null)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5.0, width: 0.0),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextFormField(
+                                  decoration: searchTextInputDecoration(
+                                      "Enter destination",
+                                      Icons.location_on_rounded,
+                                      null)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                backgroundColor: Colors.white,
+              )
+            : const PreferredSize(
+                child: SizedBox(), preferredSize: Size(0.0, 0.0)),
+        body: GoogleMap(
+          mapType: MapType.terrain,
+          initialCameraPosition: _initCamPos,
+          onMapCreated: (GoogleMapController controller) =>
+              _controller = controller,
+          onLongPress: (LatLng latLng) {
+            addMarker(true, latLng);
+          },
+          onTap: (LatLng latLng) {
+            FocusManager.instance.primaryFocus?.unfocus();
+
+            setState(() => _showTextFields
+                ? _showTextFields = false
+                : _showTextFields = true);
+          },
+          markers: Set<Marker>.of(markers.values),
+          mapToolbarEnabled: false,
+          zoomControlsEnabled: false,
+          myLocationButtonEnabled: false,
+          myLocationEnabled: true,
+          compassEnabled: true,
+          polylines: {
+            if (_routeInfo != null)
+              Polyline(
+                polylineId: PolylineId(_polyLineRouteId),
+                color: Colors.red,
+                width: 5,
+                points: _routeInfo!.polylinePoints
+                    .map(
+                      (e) => LatLng(e.latitude, e.longitude),
+                    )
+                    .toList(),
+              ),
+          },
+          onCameraMove: (pos) => _cameraPosn = pos,
+        ),
+        floatingActionButton: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            FloatingActionButton(
+              heroTag: "btn3",
+              backgroundColor: Colors.black,
+              // onPressed: getPolyline,
+              onPressed: getDir,
+              child: !_routeLoading
+                  ? const Icon(Icons.navigation_rounded)
+                  : const Loading(white: true),
+              tooltip: "Find Route",
+            ),
+            const SizedBox(height: 10.0, width: 0.0),
+            FloatingActionButton(
+              heroTag: "btn2",
+              backgroundColor: Colors.black,
+              onPressed: _turnCompassNorth,
+              child: const Icon(Icons.north),
+              tooltip: "North",
+            ),
+            const SizedBox(height: 10.0, width: 0.0),
+            FloatingActionButton(
+              heroTag: "btn1",
+              backgroundColor: Colors.black,
+              onPressed: _goToCurrLocation,
+              child: !_myLocLoading
+                  ? const Icon(Icons.my_location_rounded)
+                  : const Loading(white: true),
+              tooltip: "Current Location",
+            ),
+          ],
+        ),
+        drawer: const HomeDrawer(),
+      );
+    } else {
+      return const Scaffold(
+        body: Loading(white: false, rad: 14.0),
+      );
+    }
   }
 
   void setInitCameraPos() {
@@ -148,128 +271,6 @@ class _HomePageState extends ConsumerState<HomePage> {
           context);
     }
     setState(() => _routeLoading = false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_mapLoading) {
-      return Scaffold(
-        appBar: _showTextFields
-            ? AppBar(
-                toolbarHeight: 120.0,
-                elevation: 3.0,
-                title: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: TextFormField(
-                                  decoration: searchTextInputDecoration(
-                                      "Enter origin",
-                                      Icons.location_on_rounded,
-                                      null)),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5.0, width: 0.0),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: TextFormField(
-                                  decoration: searchTextInputDecoration(
-                                      "Enter destination",
-                                      Icons.location_on_rounded,
-                                      null)),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                backgroundColor: Colors.white,
-              )
-            : null,
-        body: GoogleMap(
-          mapType: MapType.terrain,
-          initialCameraPosition: _initCamPos,
-          onMapCreated: (GoogleMapController controller) =>
-              _controller = controller,
-          onLongPress: (LatLng latLng) {
-            addMarker(true, latLng);
-          },
-          onTap: (LatLng latLng) {
-            FocusManager.instance.primaryFocus?.unfocus();
-            setState(() => _showTextFields
-                ? _showTextFields = false
-                : _showTextFields = true);
-          },
-          markers: Set<Marker>.of(markers.values),
-          mapToolbarEnabled: false,
-          zoomControlsEnabled: false,
-          myLocationButtonEnabled: false,
-          myLocationEnabled: true,
-          compassEnabled: true,
-          polylines: {
-            if (_routeInfo != null)
-              Polyline(
-                polylineId: PolylineId(_polyLineRouteId),
-                color: Colors.red,
-                width: 5,
-                points: _routeInfo!.polylinePoints
-                    .map(
-                      (e) => LatLng(e.latitude, e.longitude),
-                    )
-                    .toList(),
-              ),
-          },
-          onCameraMove: (pos) => _cameraPosn = pos,
-        ),
-        floatingActionButton: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            FloatingActionButton(
-              heroTag: "btn3",
-              backgroundColor: Colors.black,
-              // onPressed: getPolyline,
-              onPressed: getDir,
-              child: !_routeLoading
-                  ? const Icon(Icons.navigation_rounded)
-                  : const Loading(white: true),
-              tooltip: "Find Route",
-            ),
-            const SizedBox(height: 10.0, width: 0.0),
-            FloatingActionButton(
-              heroTag: "btn2",
-              backgroundColor: Colors.black,
-              onPressed: _turnCompassNorth,
-              child: const Icon(Icons.north),
-              tooltip: "North",
-            ),
-            const SizedBox(height: 10.0, width: 0.0),
-            FloatingActionButton(
-              heroTag: "btn1",
-              backgroundColor: Colors.black,
-              onPressed: _goToCurrLocation,
-              child: !_myLocLoading
-                  ? const Icon(Icons.my_location_rounded)
-                  : const Loading(white: true),
-              tooltip: "Current Location",
-            ),
-          ],
-        ),
-        drawer: const HomeDrawer(),
-      );
-    } else {
-      return const Scaffold(
-        body: Loading(white: false, rad: 14.0),
-      );
-    }
   }
 
   @override

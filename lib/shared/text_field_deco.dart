@@ -28,7 +28,7 @@ InputDecoration searchTextInputDecoration(
     prefixText: preText,
     labelText: label,
     floatingLabelBehavior: FloatingLabelBehavior.never,
-    border: searchFieldBorder(Colors.black12, 30.0),
+    enabledBorder: searchFieldBorder(Colors.black26, 30.0),
     focusedBorder: searchFieldBorder(Colors.blue.shade200, 35.0),
     errorBorder: searchFieldBorder(Colors.red.shade200, 30.0),
     errorStyle: const TextStyle(color: Color.fromRGBO(223, 92, 82, 1.0)),
