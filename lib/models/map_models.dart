@@ -4,14 +4,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class Directions {
   final LatLngBounds latLngBounds;
   final List<PointLatLng> polylinePoints;
-  final String totalDist;
-  final String totalDuration;
+  // final String totalDist;
+  // final String totalDuration;
 
   Directions({
     required this.latLngBounds,
     required this.polylinePoints,
-    required this.totalDist,
-    required this.totalDuration,
+    // required this.totalDist,
+    // required this.totalDuration,
   });
 
   static fromMap(Map<String, dynamic> map) {
@@ -31,10 +31,11 @@ class Directions {
     }
 
     return Directions(
-        latLngBounds: bounds,
-        polylinePoints: PolylinePoints()
-            .decodePolyline(data['overview_polyline']['points']),
-        totalDist: dist,
-        totalDuration: durn);
+      latLngBounds: bounds,
+      polylinePoints:
+          PolylinePoints().decodePolyline(data['overview_polyline']['points']),
+    );
+    // totalDist: dist,
+    // totalDuration: durn);
   }
 }

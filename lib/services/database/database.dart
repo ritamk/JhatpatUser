@@ -54,7 +54,7 @@ class DatabaseService {
         url,
         headers: {"user-token": token!},
         body: jsonEncode(
-          <String, String>{
+          {
             "otp": otp,
           },
         ),

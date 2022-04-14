@@ -12,7 +12,7 @@ import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
-import 'package:jhatpat/views/home/directions_repo.dart';
+import 'package:jhatpat/views/home/g_dirn_api.dart';
 import 'package:jhatpat/views/home/home_drawer.dart';
 import 'package:jhatpat/views/home/location_services.dart';
 
@@ -153,6 +153,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  /// Tries to retrieve route information between
+  /// two coordinates from Google Directions API
   getDir() async {
     if (_dropoffLatLng != null && _pickupLatLng != null) {
       setState(() => _routeLoading = true);

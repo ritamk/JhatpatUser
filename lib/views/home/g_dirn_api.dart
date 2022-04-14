@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import 'package:jhatpat/models/map_models.dart';
 import 'package:jhatpat/services/database/database.dart';
 
@@ -12,7 +13,18 @@ class GoogleDirectionAPI {
   Future<Directions?> getDirections(
       {required LatLng pickup, required LatLng destination}) async {
     try {
-      final response = await _dio.get(_baseUrl, queryParameters: {
+      final Response response = await
+          // post(Uri.parse(_baseUrl),
+          //     body: jsonEncode(
+          //       <String, dynamic>{
+          //         "origin": "${pickup.latitude},${pickup.longitude}",
+          //         "destination": "${destination.latitude},${destination.longitude}",
+          //         "key": API_KEY,
+          //       },
+          //     ));
+          // print(response.body);
+          // Map<String, dynamic> decodedResponse = jsonDecode(response.body);
+          _dio.get(_baseUrl, queryParameters: {
         'origin': '${pickup.latitude},${pickup.longitude}',
         'destination': '${destination.latitude},${destination.longitude}',
         'key': API_KEY,
