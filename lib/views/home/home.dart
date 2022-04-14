@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_directions_api/google_directions_api.dart' as gdir;
+import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:jhatpat/models/map_models.dart';
+import 'package:google_maps_webservice/places.dart' as gmwP;
+import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
 import 'package:jhatpat/shared/text_field_deco.dart';
-import 'package:jhatpat/views/home/g_dirn_api.dart';
 import 'package:jhatpat/views/home/home_drawer.dart';
 import 'package:jhatpat/views/home/location_services.dart';
 
@@ -40,11 +41,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   final double _selectedZoom = 19.0;
   late CameraPosition _initCamPos;
   late CameraPosition _cameraPosn = _initCamPos;
-  Map<PolylineId, Polyline> polylines = {};
-  List<LatLng> polylineCoordinates = [];
+  Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
+  List<LatLng> polylineCoordinates = <LatLng>[];
   PolylinePoints polylinePoints = PolylinePoints();
-  final gdir.DirectionsService directionsService = gdir.DirectionsService();
-  Directions? _routeInfo;
+  String _searchString = "Enter a location";
 
   @override
   void initState() {
@@ -60,37 +60,156 @@ class _HomePageState extends ConsumerState<HomePage> {
             ? AppBar(
                 toolbarHeight: 120.0,
                 elevation: 3.0,
-                title: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: TextFormField(
-                                  decoration: searchTextInputDecoration(
-                                      "Enter origin",
-                                      Icons.location_on_rounded,
-                                      null)),
+                // title: Padding(
+                //   padding: const EdgeInsets.all(4.0),
+                //   child: SingleChildScrollView(
+                //     child: Column(
+                //       children: <Widget>[
+                //         Row(
+                //           children: <Widget>[
+                //             Expanded(
+                //               child: TextFormField(
+                //                   decoration: searchTextInputDecoration(
+                //                       "Enter origin",
+                //                       Icons.location_on_rounded,
+                //                       null)),
+                //             ),
+                //           ],
+                //         ),
+                //         const SizedBox(height: 5.0, width: 0.0),
+                //         Row(
+                //           children: <Widget>[
+                //             Expanded(
+                //               child: TextFormField(
+                //                   decoration: searchTextInputDecoration(
+                //                       "Enter destination",
+                //                       Icons.location_on_rounded,
+                //                       null)),
+                //             ),
+                //           ],
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                title: Column(
+                  children: <Widget>[
+                    InkWell(
+                      onTap: () async {
+                        var place = await PlacesAutocomplete.show(
+                          context: context,
+                          apiKey: API_KEY,
+                          mode: Mode.overlay,
+                          types: [],
+                          strictbounds: false,
+                          onError: (gmwP.PlacesAutocompleteResponse e) =>
+                              print(e.errorMessage),
+                        );
+
+                        if (place != null) {
+                          setState(() {
+                            _searchString = place.description.toString();
+                          });
+
+                          final plist = gmwP.GoogleMapsPlaces(
+                            apiKey: API_KEY,
+                            apiHeaders:
+                                await const GoogleApiHeaders().getHeaders(),
+                          );
+
+                          String placeId = place.placeId ?? "0";
+                          final detail =
+                              await plist.getDetailsByPlaceId(placeId);
+                          final geometry = detail.result.geometry;
+                          final lat =
+                              geometry?.location.lat ?? _initCoord.latitude;
+                          final lang =
+                              geometry?.location.lng ?? _initCoord.longitude;
+                          var newlatlang = LatLng(lat, lang);
+
+                          _controller.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(
+                                  target: newlatlang, zoom: _initZoom),
                             ),
+                          );
+
+                          _pickupLatLng = LatLng(lat, lang);
+                          addMarker(true, _pickupLatLng!);
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(
+                          children: const <Widget>[
+                            Expanded(
+                              child: Text("Enter Pick-up Point",
+                                  style: TextStyle(color: Colors.black87)),
+                            ),
+                            Icon(Icons.location_on, color: Colors.blue),
                           ],
                         ),
-                        const SizedBox(height: 5.0, width: 0.0),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: TextFormField(
-                                  decoration: searchTextInputDecoration(
-                                      "Enter destination",
-                                      Icons.location_on_rounded,
-                                      null)),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 5.0, width: 0.0),
+                    InkWell(
+                      onTap: () async {
+                        var place = await PlacesAutocomplete.show(
+                          context: context,
+                          apiKey: API_KEY,
+                          mode: Mode.overlay,
+                          types: [],
+                          strictbounds: false,
+                          onError: (gmwP.PlacesAutocompleteResponse e) =>
+                              print(e.errorMessage),
+                        );
+
+                        if (place != null) {
+                          setState(() {
+                            _searchString = place.description.toString();
+                          });
+
+                          final plist = gmwP.GoogleMapsPlaces(
+                            apiKey: API_KEY,
+                            apiHeaders:
+                                await const GoogleApiHeaders().getHeaders(),
+                          );
+
+                          String placeId = place.placeId ?? "0";
+                          final detail =
+                              await plist.getDetailsByPlaceId(placeId);
+                          final geometry = detail.result.geometry;
+                          final lat =
+                              geometry?.location.lat ?? _initCoord.latitude;
+                          final lang =
+                              geometry?.location.lng ?? _initCoord.longitude;
+                          var newlatlang = LatLng(lat, lang);
+
+                          _controller.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(
+                                  target: newlatlang, zoom: _initZoom),
+                            ),
+                          );
+
+                          _dropoffLatLng = LatLng(lat, lang);
+                          addMarker(true, _dropoffLatLng!);
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(
+                          children: const <Widget>[
+                            Expanded(
+                              child: Text("Enter Drop-off Point",
+                                  style: TextStyle(color: Colors.black87)),
+                            ),
+                            Icon(Icons.location_on, color: Colors.blue),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 backgroundColor: Colors.white,
               )
@@ -117,19 +236,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           myLocationButtonEnabled: false,
           myLocationEnabled: true,
           compassEnabled: true,
-          polylines: {
-            if (_routeInfo != null)
-              Polyline(
-                polylineId: PolylineId(_polyLineRouteId),
-                color: Colors.red,
-                width: 5,
-                points: _routeInfo!.polylinePoints
-                    .map(
-                      (e) => LatLng(e.latitude, e.longitude),
-                    )
-                    .toList(),
-              ),
-          },
+          polylines: Set<Polyline>.of(polylines.values),
           onCameraMove: (pos) => _cameraPosn = pos,
         ),
         floatingActionButton: Column(
@@ -137,11 +244,23 @@ class _HomePageState extends ConsumerState<HomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            if (polylines.isNotEmpty)
+              FloatingActionButton(
+                heroTag: "btn4",
+                backgroundColor: Colors.black,
+                // onPressed: getPolyline,
+                onPressed: _getPolyline,
+                child: !_routeLoading
+                    ? const Icon(Icons.clear)
+                    : const Loading(white: true),
+                tooltip: "Clear routes",
+              ),
+            if (polylines.isNotEmpty) const SizedBox(height: 10.0, width: 0.0),
             FloatingActionButton(
               heroTag: "btn3",
               backgroundColor: Colors.black,
               // onPressed: getPolyline,
-              onPressed: getDir,
+              onPressed: _getPolyline,
               child: !_routeLoading
                   ? const Icon(Icons.navigation_rounded)
                   : const Loading(white: true),
@@ -254,20 +373,43 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
-  /// Tries to retrieve route information between
-  /// two coordinates from Google Directions API.
-  getDir() async {
-    if (_dropoffLatLng != null && _pickupLatLng != null) {
-      setState(() => _routeLoading = true);
+  _addPolyLine() {
+    PolylineId id = PolylineId(_polyLineRouteId);
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: Colors.red,
+      points: polylineCoordinates,
+      width: 5,
+      startCap: Cap.roundCap,
+      endCap: Cap.roundCap,
+    );
+    polylines[id] = polyline;
+    setState(() {});
+  }
+
+  _getPolyline() async {
+    setState(() => _routeLoading = true);
+    if (_pickupLatLng != null && _dropoffLatLng != null) {
       try {
-        _routeInfo = await GoogleDirectionAPI().getDirections(
-            pickup: _pickupLatLng!, destination: _dropoffLatLng!);
+        PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          API_KEY,
+          PointLatLng(_pickupLatLng!.latitude, _pickupLatLng!.longitude),
+          PointLatLng(_dropoffLatLng!.latitude, _dropoffLatLng!.longitude),
+          travelMode: TravelMode.driving,
+        );
+        if (result.points.isNotEmpty) {
+          for (PointLatLng point in result.points) {
+            polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+          }
+        }
+        _addPolyLine();
       } catch (e) {
-        commonSnackbar(e.toString(), context);
+        print(e.toString());
+        commonSnackbar("Something went wrong, please try again", context);
       }
     } else {
       commonSnackbar(
-          "Either/both of pick-up or/and destination markers not set yet",
+          "Either/both of pickup or/and destination marker have not been set",
           context);
     }
     setState(() => _routeLoading = false);

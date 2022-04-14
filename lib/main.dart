@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_directions_api/google_directions_api.dart';
-import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  DirectionsService.init(API_KEY);
   await UserSharedPreferences.init();
   runApp(const ProviderScope(child: MyApp()));
 }

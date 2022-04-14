@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:jhatpat/models/user.dart';
 
-const String API_KEY = "AIzaSyB-vTdHvOxBzpybH3xVJTuIASuicCfPv8c";
+const String API_KEY = "AIzaSyB5qjb68yarSDbxov_kMSFahxbU57MLvAI";
 
 class DatabaseService {
   DatabaseService({this.token});
