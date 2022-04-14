@@ -5,12 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart' as gmwP;
+import 'package:google_maps_webservice/places.dart' as gmwp;
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
-import 'package:jhatpat/shared/text_field_deco.dart';
 import 'package:jhatpat/views/home/home_drawer.dart';
 import 'package:jhatpat/views/home/location_services.dart';
 
@@ -44,7 +43,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
   List<LatLng> polylineCoordinates = <LatLng>[];
   PolylinePoints polylinePoints = PolylinePoints();
-  String _searchString = "Enter a location";
+  String _destString = "Enter destination point";
+  String _originString = "Enter pick-up point";
 
   @override
   void initState() {
@@ -70,16 +70,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                           mode: Mode.overlay,
                           types: [],
                           strictbounds: false,
-                          onError: (gmwP.PlacesAutocompleteResponse e) =>
+                          onError: (gmwp.PlacesAutocompleteResponse e) =>
                               print(e.errorMessage),
                         );
 
                         if (place != null) {
-                          setState(() {
-                            _searchString = place.description.toString();
-                          });
+                          setState(() =>
+                              _originString = place.description.toString());
 
-                          final plist = gmwP.GoogleMapsPlaces(
+                          final plist = gmwp.GoogleMapsPlaces(
                             apiKey: API_KEY,
                             apiHeaders:
                                 await const GoogleApiHeaders().getHeaders(),
@@ -103,19 +102,27 @@ class _HomePageState extends ConsumerState<HomePage> {
                           );
 
                           _pickupLatLng = LatLng(lat, lang);
-                          addMarker(true, _pickupLatLng!);
+                          addMarker(false, _pickupLatLng!);
                         }
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
-                        child: Row(
-                          children: const <Widget>[
-                            Expanded(
-                              child: Text("Enter Pick-up Point",
-                                  style: TextStyle(color: Colors.black87)),
-                            ),
-                            Icon(Icons.location_on, color: Colors.blue),
-                          ],
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border.all(color: Colors.black38)),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(_originString,
+                                    style: const TextStyle(
+                                        color: Colors.black54, fontSize: 14.0)),
+                              ),
+                              Icon(Icons.location_on,
+                                  color: Colors.red.shade300),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -128,16 +135,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                           mode: Mode.overlay,
                           types: [],
                           strictbounds: false,
-                          onError: (gmwP.PlacesAutocompleteResponse e) =>
+                          onError: (gmwp.PlacesAutocompleteResponse e) =>
                               print(e.errorMessage),
                         );
 
                         if (place != null) {
-                          setState(() {
-                            _searchString = place.description.toString();
-                          });
+                          setState(
+                              () => _destString = place.description.toString());
 
-                          final plist = gmwP.GoogleMapsPlaces(
+                          final plist = gmwp.GoogleMapsPlaces(
                             apiKey: API_KEY,
                             apiHeaders:
                                 await const GoogleApiHeaders().getHeaders(),
@@ -166,14 +172,22 @@ class _HomePageState extends ConsumerState<HomePage> {
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
-                        child: Row(
-                          children: const <Widget>[
-                            Expanded(
-                              child: Text("Enter Drop-off Point",
-                                  style: TextStyle(color: Colors.black87)),
-                            ),
-                            Icon(Icons.location_on, color: Colors.blue),
-                          ],
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border.all(color: Colors.black38)),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(_destString,
+                                    style: const TextStyle(
+                                        color: Colors.black54, fontSize: 14.0)),
+                              ),
+                              Icon(Icons.location_on,
+                                  color: Colors.blue.shade300),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -203,7 +217,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           zoomControlsEnabled: false,
           myLocationButtonEnabled: false,
           myLocationEnabled: true,
-          compassEnabled: true,
+          compassEnabled: false,
           polylines: Set<Polyline>.of(polylines.values),
           onCameraMove: (pos) => _cameraPosn = pos,
         ),
@@ -212,23 +226,11 @@ class _HomePageState extends ConsumerState<HomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            if (polylines.isNotEmpty)
-              FloatingActionButton(
-                heroTag: "btn4",
-                backgroundColor: Colors.black,
-                // onPressed: getPolyline,
-                onPressed: _getPolyline,
-                child: !_routeLoading
-                    ? const Icon(Icons.clear)
-                    : const Loading(white: true),
-                tooltip: "Clear routes",
-              ),
-            if (polylines.isNotEmpty) const SizedBox(height: 10.0, width: 0.0),
             FloatingActionButton(
               heroTag: "btn3",
               backgroundColor: Colors.black,
               // onPressed: getPolyline,
-              onPressed: _getPolyline,
+              onPressed: getPolyline,
               child: !_routeLoading
                   ? const Icon(Icons.navigation_rounded)
                   : const Loading(white: true),
@@ -263,6 +265,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  /// Initialise the position of the camera at the start of the application.
+  /// If a previously stored instance of camera position is available on the
+  /// device then it is used.
   void setInitCameraPos() {
     List<double?> initSavedCoord = UserSharedPreferences.getMapGeoLoc();
     _initCoord = initSavedCoord.isEmpty
@@ -341,7 +346,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
-  _addPolyLine() {
+  /// Draws the routes between two points using the polyline data
+  addPolyLine() {
     PolylineId id = PolylineId(_polyLineRouteId);
     Polyline polyline = Polyline(
       polylineId: id,
@@ -355,8 +361,16 @@ class _HomePageState extends ConsumerState<HomePage> {
     setState(() {});
   }
 
-  _getPolyline() async {
+  /// Fetches routes from Google Directions API and decodes
+  /// the polyline data and sends it to a function to draw the routes.
+  getPolyline() async {
     setState(() => _routeLoading = true);
+    if (polylines.isNotEmpty) {
+      setState(() {
+        polylines.clear();
+        polylineCoordinates.clear();
+      });
+    }
     if (_pickupLatLng != null && _dropoffLatLng != null) {
       try {
         PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
@@ -370,7 +384,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             polylineCoordinates.add(LatLng(point.latitude, point.longitude));
           }
         }
-        _addPolyLine();
+        addPolyLine();
       } catch (e) {
         print(e.toString());
         commonSnackbar("Something went wrong, please try again", context);
