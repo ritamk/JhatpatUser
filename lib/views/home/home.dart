@@ -60,38 +60,6 @@ class _HomePageState extends ConsumerState<HomePage> {
             ? AppBar(
                 toolbarHeight: 120.0,
                 elevation: 3.0,
-                // title: Padding(
-                //   padding: const EdgeInsets.all(4.0),
-                //   child: SingleChildScrollView(
-                //     child: Column(
-                //       children: <Widget>[
-                //         Row(
-                //           children: <Widget>[
-                //             Expanded(
-                //               child: TextFormField(
-                //                   decoration: searchTextInputDecoration(
-                //                       "Enter origin",
-                //                       Icons.location_on_rounded,
-                //                       null)),
-                //             ),
-                //           ],
-                //         ),
-                //         const SizedBox(height: 5.0, width: 0.0),
-                //         Row(
-                //           children: <Widget>[
-                //             Expanded(
-                //               child: TextFormField(
-                //                   decoration: searchTextInputDecoration(
-                //                       "Enter destination",
-                //                       Icons.location_on_rounded,
-                //                       null)),
-                //             ),
-                //           ],
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
                 title: Column(
                   children: <Widget>[
                     InkWell(
@@ -377,7 +345,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     PolylineId id = PolylineId(_polyLineRouteId);
     Polyline polyline = Polyline(
       polylineId: id,
-      color: Colors.red,
+      color: Colors.black87,
       points: polylineCoordinates,
       width: 5,
       startCap: Cap.roundCap,

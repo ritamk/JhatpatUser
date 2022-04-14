@@ -14,56 +14,35 @@
   //       .then((value) => dropoffIcon = value);
   // }
 
-  // title: InkWell(
-  //   onTap: () async {
-  //     var place = await PlacesAutocomplete.show(
-  //       context: context,
-  //       apiKey: API_KEY,
-  //       mode: Mode.overlay,
-  //       types: [],
-  //       strictbounds: false,
-  //       onError: (PlacesAutocompleteResponse e) =>
-  //           print(e.errorMessage),
-  //     );
-
-  // if (place != null) {
-  //   setState(() {
-  //     _searchString = place.description.toString();
-  //   });
-
-  // final plist = GoogleMapsPlaces(
-  //   apiKey: API_KEY,
-  //   apiHeaders: await const GoogleApiHeaders().getHeaders(),
-  // );
-
-  // String placeId = place.placeId ?? "0";
-  // final detail = await plist.getDetailsByPlaceId(placeId);
-  // final geometry = detail.result.geometry;
-  // final lat = geometry?.location.lat ?? _initCoord.latitude;
-  // final lang = geometry?.location.lng ?? _initCoord.longitude;
-  // var newlatlang = LatLng(lat, lang);
-
-  //       _controller.animateCamera(
-  //         CameraUpdate.newCameraPosition(
-  //           CameraPosition(target: newlatlang, zoom: 19.0),
-  //         ),
-  //       );
-  //     }
-  //   },
-  //   child: Padding(
-  //     padding: const EdgeInsets.all(15),
-  //     child: Card(
-  //       child: Container(
-  //           padding: const EdgeInsets.all(0),
-  //           width: MediaQuery.of(context).size.width - 40,
-  //           child: ListTile(
-  //             title: Text(
-  //               _searchString,
-  //               style: const TextStyle(fontSize: 18),
-  //             ),
-  //             trailing: const Icon(Icons.search),
-  //             dense: true,
-  //           )),
-  //     ),
-  //   ),
-  // ),
+  // title: Padding(
+                //   padding: const EdgeInsets.all(4.0),
+                //   child: SingleChildScrollView(
+                //     child: Column(
+                //       children: <Widget>[
+                //         Row(
+                //           children: <Widget>[
+                //             Expanded(
+                //               child: TextFormField(
+                //                   decoration: searchTextInputDecoration(
+                //                       "Enter origin",
+                //                       Icons.location_on_rounded,
+                //                       null)),
+                //             ),
+                //           ],
+                //         ),
+                //         const SizedBox(height: 5.0, width: 0.0),
+                //         Row(
+                //           children: <Widget>[
+                //             Expanded(
+                //               child: TextFormField(
+                //                   decoration: searchTextInputDecoration(
+                //                       "Enter destination",
+                //                       Icons.location_on_rounded,
+                //                       null)),
+                //             ),
+                //           ],
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
