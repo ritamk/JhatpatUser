@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_directions_api/google_directions_api.dart' as gdir;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart' as gweb;
 import 'package:jhatpat/models/map_models.dart';
-import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
+import 'package:jhatpat/shared/text_field_deco.dart';
 import 'package:jhatpat/views/home/g_dirn_api.dart';
 import 'package:jhatpat/views/home/home_drawer.dart';
 import 'package:jhatpat/views/home/location_services.dart';
@@ -27,18 +24,22 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool _routeLoading = false;
   bool _mapLoading = true;
   bool _myLocLoading = false;
+  bool _showTextFields = true;
+
   late GoogleMapController _controller;
   late LatLng _initCoord;
   Position? coord;
-  late CameraPosition currentPosn;
+
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   final String _polyLineRouteId = "polyRoute";
   final String _destMarkerId = "DestinationMarker";
   LatLng? _pickupLatLng;
   final String _myMarkerId = "PickupMarker";
   LatLng? _dropoffLatLng;
-  String _searchString = "";
+  final double _initZoom = 14.0;
+  final double _selectedZoom = 19.0;
   late CameraPosition _initCamPos;
+  late CameraPosition _cameraPosn = _initCamPos;
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
@@ -49,6 +50,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     setInitCameraPos();
+    setState(() {});
   }
 
   void setInitCameraPos() {
@@ -60,11 +62,13 @@ class _HomePageState extends ConsumerState<HomePage> {
       target: _initCoord,
       bearing: 0.0,
       tilt: 0.0,
-      zoom: 14,
+      zoom: _initZoom,
     );
     setState(() => _mapLoading = false);
   }
 
+  /// Moves camera to current location and marks it
+  /// as the pickup point.
   void _goToCurrLocation() async {
     setState(() => _myLocLoading = true);
     try {
@@ -77,7 +81,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         target: LatLng(coord!.latitude, coord!.longitude),
         bearing: 0.0,
         tilt: 0.0,
-        zoom: 19.0,
+        zoom: _selectedZoom,
       )));
       addMarker(false, LatLng(coord!.latitude, coord!.longitude));
     } else {
@@ -86,11 +90,19 @@ class _HomePageState extends ConsumerState<HomePage> {
     setState(() => _myLocLoading = false);
   }
 
+  /// Makes the camera bearing 0.0 hence turning the map
+  /// to North side facing upwards.
   void _turnCompassNorth() {
     _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: currentPosn.target, bearing: 0.0, zoom: currentPosn.zoom)));
+      target: _cameraPosn.target,
+      bearing: 0.0,
+      zoom: _cameraPosn.zoom,
+      tilt: _cameraPosn.tilt,
+    )));
   }
 
+  /// Adds a blue marker for pickup location and
+  /// a blue marker for drop-off location.
   void addMarker(bool destination, LatLng coordinate) async {
     final MarkerId markerId =
         MarkerId(destination ? _destMarkerId : _myMarkerId);
@@ -119,42 +131,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
-  void addPolyLine() {
-    PolylineId id = PolylineId(_polyLineRouteId);
-    Polyline polyline = Polyline(
-        polylineId: id, color: Colors.red, points: polylineCoordinates);
-    polylines[id] = polyline;
-    setState(() {});
-  }
-
-  void getPolyline() async {
-    if (_dropoffLatLng != null && _pickupLatLng != null) {
-      PolylineResult? result;
-      try {
-        result = await polylinePoints.getRouteBetweenCoordinates(
-            API_KEY,
-            PointLatLng(_pickupLatLng!.latitude, _pickupLatLng!.longitude),
-            PointLatLng(_dropoffLatLng!.latitude, _dropoffLatLng!.longitude),
-            travelMode: TravelMode.driving,
-            wayPoints: [
-              PolylineWayPoint(location: "Route")
-            ]).whenComplete(() => setState(() => _routeLoading = false));
-        if (result.points.isNotEmpty) {
-          for (var point in result.points) {
-            polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-          }
-        }
-        addPolyLine();
-      } catch (e) {
-        print(e.toString());
-      }
-    } else {
-      null;
-    }
-  }
-
   /// Tries to retrieve route information between
-  /// two coordinates from Google Directions API
+  /// two coordinates from Google Directions API.
   getDir() async {
     if (_dropoffLatLng != null && _pickupLatLng != null) {
       setState(() => _routeLoading = true);
@@ -174,139 +152,124 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return !_mapLoading
-        ? Scaffold(
-            appBar: AppBar(
-              elevation: 3.0,
-              title: InkWell(
-                onTap: () async {
-                  var place = await PlacesAutocomplete.show(
-                    context: context,
-                    apiKey: API_KEY,
-                    mode: Mode.fullscreen,
-                    types: [],
-                    strictbounds: false,
-                    onError: (gweb.PlacesAutocompleteResponse e) =>
-                        print(e.errorMessage),
-                  );
-
-                  if (place != null) {
-                    setState(() {
-                      _searchString = place.description.toString();
-                    });
-
-                    final plist = gweb.GoogleMapsPlaces(
-                      apiKey: API_KEY,
-                      apiHeaders: await const GoogleApiHeaders().getHeaders(),
-                    );
-
-                    String placeId = place.placeId ?? "0";
-                    final detail = await plist.getDetailsByPlaceId(placeId);
-                    final geometry = detail.result.geometry;
-                    final lat = geometry?.location.lat ?? _initCoord.latitude;
-                    final lang = geometry?.location.lng ?? _initCoord.longitude;
-                    var newlatlang = LatLng(lat, lang);
-
-                    _controller.animateCamera(
-                      CameraUpdate.newCameraPosition(
-                        CameraPosition(target: newlatlang, zoom: 19.0),
-                      ),
-                    );
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: const <Widget>[
-                          Text(
-                            "Search",
-                            style: TextStyle(fontSize: 16.0),
-                          ),
-                          SizedBox(height: 0.0, width: 20.0),
-                          Icon(Icons.search, color: Colors.black54)
-                        ],
-                      ),
+    if (!_mapLoading) {
+      return Scaffold(
+        appBar: _showTextFields
+            ? AppBar(
+                toolbarHeight: 120.0,
+                elevation: 3.0,
+                title: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextFormField(
+                                  decoration: searchTextInputDecoration(
+                                      "Enter origin",
+                                      Icons.location_on_rounded,
+                                      null)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5.0, width: 0.0),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextFormField(
+                                  decoration: searchTextInputDecoration(
+                                      "Enter destination",
+                                      Icons.location_on_rounded,
+                                      null)),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
+                backgroundColor: Colors.white,
+              )
+            : null,
+        body: GoogleMap(
+          mapType: MapType.terrain,
+          initialCameraPosition: _initCamPos,
+          onMapCreated: (GoogleMapController controller) =>
+              _controller = controller,
+          onLongPress: (LatLng latLng) {
+            addMarker(true, latLng);
+          },
+          onTap: (LatLng latLng) {
+            FocusManager.instance.primaryFocus?.unfocus();
+            setState(() => _showTextFields
+                ? _showTextFields = false
+                : _showTextFields = true);
+          },
+          markers: Set<Marker>.of(markers.values),
+          mapToolbarEnabled: false,
+          zoomControlsEnabled: false,
+          myLocationButtonEnabled: false,
+          myLocationEnabled: true,
+          compassEnabled: true,
+          polylines: {
+            if (_routeInfo != null)
+              Polyline(
+                polylineId: PolylineId(_polyLineRouteId),
+                color: Colors.red,
+                width: 5,
+                points: _routeInfo!.polylinePoints
+                    .map(
+                      (e) => LatLng(e.latitude, e.longitude),
+                    )
+                    .toList(),
               ),
-              backgroundColor: Colors.white,
+          },
+          onCameraMove: (pos) => _cameraPosn = pos,
+        ),
+        floatingActionButton: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            FloatingActionButton(
+              heroTag: "btn3",
+              backgroundColor: Colors.black,
+              // onPressed: getPolyline,
+              onPressed: getDir,
+              child: !_routeLoading
+                  ? const Icon(Icons.navigation_rounded)
+                  : const Loading(white: true),
+              tooltip: "Find Route",
             ),
-            body: GoogleMap(
-              mapType: MapType.terrain,
-              initialCameraPosition: _initCamPos,
-              onMapCreated: (GoogleMapController controller) =>
-                  _controller = controller,
-              onLongPress: (LatLng latLng) {
-                addMarker(true, latLng);
-              },
-              onTap: (LatLng latLng) =>
-                  FocusManager.instance.primaryFocus?.unfocus(),
-              onCameraMove: (CameraPosition cameraPosn) =>
-                  currentPosn = cameraPosn,
-              markers: Set<Marker>.of(markers.values),
-              mapToolbarEnabled: false,
-              zoomControlsEnabled: false,
-              myLocationButtonEnabled: false,
-              myLocationEnabled: true,
-              compassEnabled: true,
-              polylines: {
-                if (_routeInfo != null)
-                  Polyline(
-                    polylineId: PolylineId(_polyLineRouteId),
-                    color: Colors.red,
-                    width: 5,
-                    points: _routeInfo!.polylinePoints
-                        .map(
-                          (e) => LatLng(e.latitude, e.longitude),
-                        )
-                        .toList(),
-                  ),
-              },
+            const SizedBox(height: 10.0, width: 0.0),
+            FloatingActionButton(
+              heroTag: "btn2",
+              backgroundColor: Colors.black,
+              onPressed: _turnCompassNorth,
+              child: const Icon(Icons.north),
+              tooltip: "North",
             ),
-            floatingActionButton: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                FloatingActionButton(
-                  heroTag: "btn3",
-                  backgroundColor: Colors.black,
-                  // onPressed: getPolyline,
-                  onPressed: getDir,
-                  child: !_routeLoading
-                      ? const Icon(Icons.navigation_rounded)
-                      : const Loading(white: true),
-                  tooltip: "Find Route",
-                ),
-                const SizedBox(height: 10.0, width: 0.0),
-                FloatingActionButton(
-                  heroTag: "btn2",
-                  backgroundColor: Colors.black,
-                  onPressed: _turnCompassNorth,
-                  child: const Icon(Icons.north),
-                  tooltip: "North",
-                ),
-                const SizedBox(height: 10.0, width: 0.0),
-                FloatingActionButton(
-                  heroTag: "btn1",
-                  backgroundColor: Colors.black,
-                  onPressed: _goToCurrLocation,
-                  child: !_myLocLoading
-                      ? const Icon(Icons.my_location_rounded)
-                      : const Loading(white: true),
-                  tooltip: "Current Location",
-                ),
-              ],
+            const SizedBox(height: 10.0, width: 0.0),
+            FloatingActionButton(
+              heroTag: "btn1",
+              backgroundColor: Colors.black,
+              onPressed: _goToCurrLocation,
+              child: !_myLocLoading
+                  ? const Icon(Icons.my_location_rounded)
+                  : const Loading(white: true),
+              tooltip: "Current Location",
             ),
-            drawer: const HomeDrawer(),
-          )
-        : const Scaffold(
-            body: Loading(white: false, rad: 14.0),
-          );
+          ],
+        ),
+        drawer: const HomeDrawer(),
+      );
+    } else {
+      return const Scaffold(
+        body: Loading(white: false, rad: 14.0),
+      );
+    }
   }
 
   @override

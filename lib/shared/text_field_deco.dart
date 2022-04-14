@@ -18,19 +18,28 @@ InputDecoration authTextInputDecoration(
 }
 
 InputDecoration searchTextInputDecoration(
-    String label, IconData suffixIcon, String? preText) {
+    String label, IconData? suffixIcon, String? preText) {
   return InputDecoration(
-    contentPadding: const EdgeInsets.all(20.0),
+    contentPadding: const EdgeInsets.all(12.0),
     fillColor: Colors.white,
     filled: true,
-    prefixIcon: Icon(suffixIcon),
+    suffixIcon:
+        suffixIcon != null ? Icon(suffixIcon, color: Colors.black26) : null,
     prefixText: preText,
     labelText: label,
     floatingLabelBehavior: FloatingLabelBehavior.never,
-    border: textFieldBorder(true, 30.0),
-    focusedBorder: textFieldBorder(true, 35.0),
-    errorBorder: textFieldBorder(true, 30.0),
+    border: searchFieldBorder(Colors.black12, 30.0),
+    focusedBorder: searchFieldBorder(Colors.blue.shade200, 35.0),
+    errorBorder: searchFieldBorder(Colors.red.shade200, 30.0),
     errorStyle: const TextStyle(color: Color.fromRGBO(223, 92, 82, 1.0)),
+  );
+}
+
+OutlineInputBorder searchFieldBorder(Color col, double rad) {
+  return OutlineInputBorder(
+    // borderSide: border ? const BorderSide(width: 0.5) : BorderSide.none,
+    borderSide: BorderSide(color: col, width: 0.5),
+    borderRadius: BorderRadius.circular(rad),
   );
 }
 
