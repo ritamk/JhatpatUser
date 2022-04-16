@@ -63,48 +63,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 title: Column(
                   children: <Widget>[
                     InkWell(
-                      onTap: () async {
-                        var place = await PlacesAutocomplete.show(
-                          context: context,
-                          apiKey: API_KEY,
-                          mode: Mode.overlay,
-                          types: [],
-                          strictbounds: false,
-                          onError: (gmwp.PlacesAutocompleteResponse e) =>
-                              print(e.errorMessage),
-                        );
-
-                        if (place != null) {
-                          setState(() =>
-                              _originString = place.description.toString());
-
-                          final plist = gmwp.GoogleMapsPlaces(
-                            apiKey: API_KEY,
-                            apiHeaders:
-                                await const GoogleApiHeaders().getHeaders(),
-                          );
-
-                          String placeId = place.placeId ?? "0";
-                          final detail =
-                              await plist.getDetailsByPlaceId(placeId);
-                          final geometry = detail.result.geometry;
-                          final lat =
-                              geometry?.location.lat ?? _initCoord.latitude;
-                          final lang =
-                              geometry?.location.lng ?? _initCoord.longitude;
-                          var newlatlang = LatLng(lat, lang);
-
-                          _controller.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                  target: newlatlang, zoom: _initZoom),
-                            ),
-                          );
-
-                          _pickupLatLng = LatLng(lat, lang);
-                          addMarker(false, _pickupLatLng!);
-                        }
-                      },
+                      onTap: _autcompletePlaces(false),
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Container(
@@ -128,48 +87,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                     const SizedBox(height: 5.0, width: 0.0),
                     InkWell(
-                      onTap: () async {
-                        var place = await PlacesAutocomplete.show(
-                          context: context,
-                          apiKey: API_KEY,
-                          mode: Mode.overlay,
-                          types: [],
-                          strictbounds: false,
-                          onError: (gmwp.PlacesAutocompleteResponse e) =>
-                              print(e.errorMessage),
-                        );
-
-                        if (place != null) {
-                          setState(
-                              () => _destString = place.description.toString());
-
-                          final plist = gmwp.GoogleMapsPlaces(
-                            apiKey: API_KEY,
-                            apiHeaders:
-                                await const GoogleApiHeaders().getHeaders(),
-                          );
-
-                          String placeId = place.placeId ?? "0";
-                          final detail =
-                              await plist.getDetailsByPlaceId(placeId);
-                          final geometry = detail.result.geometry;
-                          final lat =
-                              geometry?.location.lat ?? _initCoord.latitude;
-                          final lang =
-                              geometry?.location.lng ?? _initCoord.longitude;
-                          var newlatlang = LatLng(lat, lang);
-
-                          _controller.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                  target: newlatlang, zoom: _initZoom),
-                            ),
-                          );
-
-                          _dropoffLatLng = LatLng(lat, lang);
-                          addMarker(true, _dropoffLatLng!);
-                        }
-                      },
+                      onTap: _autcompletePlaces(true),
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Container(
@@ -198,7 +116,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             : const PreferredSize(
                 child: SizedBox(), preferredSize: Size(0.0, 0.0)),
         body: GoogleMap(
-          mapType: MapType.terrain,
+          mapType: MapType.normal,
           initialCameraPosition: _initCamPos,
           onMapCreated: (GoogleMapController controller) =>
               _controller = controller,
@@ -395,6 +313,49 @@ class _HomePageState extends ConsumerState<HomePage> {
           context);
     }
     setState(() => _routeLoading = false);
+  }
+
+  /// Uses the Google Places API to generate search results for places.
+  _autcompletePlaces(bool dest) async {
+    var place = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: API_KEY,
+      mode: Mode.overlay,
+      types: [],
+      strictbounds: false,
+      onError: (gmwp.PlacesAutocompleteResponse e) => print(e.errorMessage),
+    );
+
+    if (place != null) {
+      setState(() =>
+          dest ? _destString : _originString = place.description.toString());
+
+      final plist = gmwp.GoogleMapsPlaces(
+        apiKey: API_KEY,
+        apiHeaders: await const GoogleApiHeaders().getHeaders(),
+      );
+
+      String placeId = place.placeId ?? "0";
+      final detail = await plist.getDetailsByPlaceId(placeId);
+      final geometry = detail.result.geometry;
+      final lat = geometry?.location.lat ?? _initCoord.latitude;
+      final lang = geometry?.location.lng ?? _initCoord.longitude;
+      var newlatlang = LatLng(lat, lang);
+
+      _controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: newlatlang, zoom: _initZoom),
+        ),
+      );
+
+      if (dest) {
+        _dropoffLatLng = LatLng(lat, lang);
+        addMarker(false, _dropoffLatLng!);
+      } else {
+        _pickupLatLng = LatLng(lat, lang);
+        addMarker(false, _pickupLatLng!);
+      }
+    }
   }
 
   @override

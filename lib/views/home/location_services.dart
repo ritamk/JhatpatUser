@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 Future<Position?> determinePosition() async {
@@ -29,3 +30,5 @@ Future<Position?> determinePosition() async {
     return Geolocator.getLastKnownPosition();
   }
 }
+
+class MapNotifier extends ChangeNotifier {}
