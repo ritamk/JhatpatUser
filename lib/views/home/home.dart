@@ -62,6 +62,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 toolbarHeight: 120.0,
                 elevation: 3.0,
                 title: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
                     // Pick up
                     InkWell(
@@ -83,22 +84,30 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       color: Colors.black54, fontSize: 14.0),
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () =>
-                                    setState(() => _choosingDest = false),
-                                icon: const Icon(Icons.location_on),
-                                color: !_choosingDest
-                                    ? Colors.red.shade700
-                                    : Colors.red.shade200,
-                                padding: const EdgeInsets.all(0.0),
-                                tooltip: "Mark pick-up on map",
+                              Tooltip(
+                                child: ClipOval(
+                                  child: MaterialButton(
+                                    onPressed: () =>
+                                        setState(() => _choosingDest = false),
+                                    child: Icon(
+                                      Icons.location_on,
+                                      color: !_choosingDest
+                                          ? Colors.red.shade700
+                                          : Colors.red.shade200,
+                                    ),
+                                    visualDensity: VisualDensity.compact,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    minWidth: 24.0,
+                                  ),
+                                ),
+                                message: "Mark pick-up on map",
                               ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 5.0, width: 0.0),
                     // Destination
                     InkWell(
                       onTap: () => _autcompletePlaces(true),
@@ -119,15 +128,24 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       color: Colors.black54, fontSize: 14.0),
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () =>
-                                    setState(() => _choosingDest = true),
-                                icon: const Icon(Icons.location_on),
-                                color: _choosingDest
-                                    ? Colors.blue.shade700
-                                    : Colors.blue.shade200,
-                                padding: const EdgeInsets.all(0.0),
-                                tooltip: "Mark destination on map",
+                              Tooltip(
+                                child: ClipOval(
+                                  child: MaterialButton(
+                                    onPressed: () =>
+                                        setState(() => _choosingDest = true),
+                                    child: Icon(
+                                      Icons.location_on,
+                                      color: _choosingDest
+                                          ? Colors.blue.shade700
+                                          : Colors.blue.shade200,
+                                    ),
+                                    visualDensity: VisualDensity.compact,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    minWidth: 24.0,
+                                  ),
+                                ),
+                                message: "Mark destination on map",
                               ),
                             ],
                           ),
@@ -352,8 +370,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
 
     if (place != null) {
-      setState(() =>
-          dest ? _destString : _originString = place.description.toString());
+      setState(() => dest
+          ? _destString = place.description.toString()
+          : _originString = place.description.toString());
 
       final plist = gmwp.GoogleMapsPlaces(
         apiKey: API_KEY,
@@ -375,7 +394,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
       if (dest) {
         _dropoffLatLng = LatLng(lat, lang);
-        addMarker(false, _dropoffLatLng!);
+        addMarker(true, _dropoffLatLng!);
       } else {
         _pickupLatLng = LatLng(lat, lang);
         addMarker(false, _pickupLatLng!);
