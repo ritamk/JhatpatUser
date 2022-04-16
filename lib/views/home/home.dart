@@ -25,6 +25,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool _mapLoading = true;
   bool _myLocLoading = false;
   bool _showTextFields = true;
+  bool _choosingDest = true;
 
   late GoogleMapController _controller;
   late LatLng _initCoord;
@@ -62,48 +63,72 @@ class _HomePageState extends ConsumerState<HomePage> {
                 elevation: 3.0,
                 title: Column(
                   children: <Widget>[
+                    // Pick up
                     InkWell(
-                      onTap: _autcompletePlaces(false),
+                      onTap: () => _autcompletePlaces(false),
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Container(
                           padding: const EdgeInsets.all(8.0),
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              border: Border.all(color: Colors.black38)),
+                            borderRadius: BorderRadius.circular(20.0),
+                            border: Border.all(color: Colors.black38),
+                          ),
                           child: Row(
                             children: <Widget>[
                               Expanded(
-                                child: Text(_originString,
-                                    style: const TextStyle(
-                                        color: Colors.black54, fontSize: 14.0)),
+                                child: Text(
+                                  _originString,
+                                  style: const TextStyle(
+                                      color: Colors.black54, fontSize: 14.0),
+                                ),
                               ),
-                              Icon(Icons.location_on,
-                                  color: Colors.red.shade300),
+                              IconButton(
+                                onPressed: () =>
+                                    setState(() => _choosingDest = false),
+                                icon: const Icon(Icons.location_on),
+                                color: !_choosingDest
+                                    ? Colors.red.shade700
+                                    : Colors.red.shade200,
+                                padding: const EdgeInsets.all(0.0),
+                                tooltip: "Mark pick-up on map",
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 5.0, width: 0.0),
+                    // Destination
                     InkWell(
-                      onTap: _autcompletePlaces(true),
+                      onTap: () => _autcompletePlaces(true),
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Container(
                           padding: const EdgeInsets.all(8.0),
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              border: Border.all(color: Colors.black38)),
+                            borderRadius: BorderRadius.circular(20.0),
+                            border: Border.all(color: Colors.black38),
+                          ),
                           child: Row(
                             children: <Widget>[
                               Expanded(
-                                child: Text(_destString,
-                                    style: const TextStyle(
-                                        color: Colors.black54, fontSize: 14.0)),
+                                child: Text(
+                                  _destString,
+                                  style: const TextStyle(
+                                      color: Colors.black54, fontSize: 14.0),
+                                ),
                               ),
-                              Icon(Icons.location_on,
-                                  color: Colors.blue.shade300),
+                              IconButton(
+                                onPressed: () =>
+                                    setState(() => _choosingDest = true),
+                                icon: const Icon(Icons.location_on),
+                                color: _choosingDest
+                                    ? Colors.blue.shade700
+                                    : Colors.blue.shade200,
+                                padding: const EdgeInsets.all(0.0),
+                                tooltip: "Mark destination on map",
+                              ),
                             ],
                           ),
                         ),
@@ -121,7 +146,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           onMapCreated: (GoogleMapController controller) =>
               _controller = controller,
           onLongPress: (LatLng latLng) {
-            addMarker(true, latLng);
+            addMarker(_choosingDest, latLng);
           },
           onTap: (LatLng latLng) {
             FocusManager.instance.primaryFocus?.unfocus();
