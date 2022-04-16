@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as gmwp;
+import 'package:jhatpat/models/map_model.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
@@ -46,6 +47,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   PolylinePoints polylinePoints = PolylinePoints();
   String _destString = "Enter destination point";
   String _originString = "Enter pick-up point";
+  MapModel? _model;
 
   @override
   void initState() {
@@ -179,7 +181,18 @@ class _HomePageState extends ConsumerState<HomePage> {
           myLocationButtonEnabled: false,
           myLocationEnabled: true,
           compassEnabled: false,
-          polylines: Set<Polyline>.of(polylines.values),
+          // polylines: Set<Polyline>.of(polylines.values),
+          polylines: {
+            if (_model != null)
+              Polyline(
+                polylineId: const PolylineId("poly"),
+                color: Colors.black,
+                width: 5,
+                points: _model!.polyLinePts
+                    .map((PointLatLng e) => LatLng(e.latitude, e.longitude))
+                    .toList(),
+              )
+          },
           onCameraMove: (pos) => _cameraPosn = pos,
         ),
         floatingActionButton: Column(
@@ -191,7 +204,16 @@ class _HomePageState extends ConsumerState<HomePage> {
               heroTag: "btn3",
               backgroundColor: Colors.black,
               // onPressed: getPolyline,
-              onPressed: getPolyline,
+              onPressed: () async {
+                if (_pickupLatLng != null && _dropoffLatLng != null) {
+                  final directions = await GetDirections()
+                      .getDirections(_pickupLatLng!, _dropoffLatLng!);
+                  setState(() => _model = directions);
+                  _model != null
+                      ? CameraUpdate.newLatLngBounds(_model!.bounds, 4.0)
+                      : null;
+                }
+              },
               child: !_routeLoading
                   ? const Icon(Icons.navigation_rounded)
                   : const Loading(white: true),
