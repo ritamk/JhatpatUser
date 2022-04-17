@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -27,6 +29,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool _myLocLoading = false;
   bool _showTextFields = true;
   bool _choosingDest = false;
+  bool _showDist = false;
 
   late GoogleMapController _controller;
   late LatLng _initCoord;
@@ -48,6 +51,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   String _destString = "Enter destination point";
   String _originString = "Enter pick-up point";
   MapModel? _model;
+  String _dist = "XX km";
+  String _durn = "XX hours XX mins";
 
   @override
   void initState() {
@@ -61,8 +66,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       return Scaffold(
         appBar: _showTextFields
             ? AppBar(
-                toolbarHeight: 120.0,
-                elevation: 3.0,
                 title: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -156,45 +159,74 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   ],
                 ),
+                toolbarHeight: 120.0,
+                elevation: 4.0,
                 backgroundColor: Colors.white,
               )
             : const PreferredSize(
                 child: SizedBox(), preferredSize: Size(0.0, 0.0)),
-        body: GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: _initCamPos,
-          onMapCreated: (GoogleMapController controller) =>
-              _controller = controller,
-          onLongPress: (LatLng latLng) {
-            addMarker(_choosingDest, latLng);
-          },
-          onTap: (LatLng latLng) {
-            FocusManager.instance.primaryFocus?.unfocus();
+        body: Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: _initCamPos,
+              onMapCreated: (GoogleMapController controller) =>
+                  _controller = controller,
+              onLongPress: (LatLng latLng) {
+                addMarker(_choosingDest, latLng);
+              },
+              onTap: (LatLng latLng) {
+                FocusManager.instance.primaryFocus?.unfocus();
 
-            setState(() => _showTextFields
-                ? _showTextFields = false
-                : _showTextFields = true);
-          },
-          markers: Set<Marker>.of(markers.values),
-          mapToolbarEnabled: false,
-          zoomControlsEnabled: false,
-          myLocationButtonEnabled: false,
-          myLocationEnabled: true,
-          compassEnabled: false,
-          polylines: <Polyline>{
-            if (_model != null)
-              Polyline(
-                points: _model!.polyLinePts
-                    .map((PointLatLng e) => LatLng(e.latitude, e.longitude))
-                    .toList(),
-                polylineId: PolylineId(_polyLineRouteId),
-                color: Colors.black,
-                width: 5,
-                startCap: Cap.roundCap,
-                endCap: Cap.roundCap,
+                setState(() => _showTextFields
+                    ? _showTextFields = false
+                    : _showTextFields = true);
+              },
+              markers: Set<Marker>.of(markers.values),
+              mapToolbarEnabled: false,
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: false,
+              myLocationEnabled: true,
+              compassEnabled: false,
+              polylines: <Polyline>{
+                if (_model != null)
+                  Polyline(
+                    points: _model!.polyLinePts
+                        .map((PointLatLng e) => LatLng(e.latitude, e.longitude))
+                        .toList(),
+                    polylineId: PolylineId(_polyLineRouteId),
+                    color: Colors.black,
+                    width: 5,
+                    startCap: Cap.roundCap,
+                    endCap: Cap.roundCap,
+                  ),
+              },
+              onCameraMove: (pos) => _cameraPosn = pos,
+            ),
+            if (_showDist)
+              Positioned(
+                bottom: 25.0,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 8.0),
+                    child: Text(
+                      "$_dist, \t$_durn",
+                      style: const TextStyle(
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  color: Colors.black,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0)),
+                  elevation: 4.0,
+                ),
               ),
-          },
-          onCameraMove: (pos) => _cameraPosn = pos,
+          ],
         ),
         floatingActionButton: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -248,9 +280,14 @@ class _HomePageState extends ConsumerState<HomePage> {
         final directions = await GetDirections()
             .getDirections(_pickupLatLng!, _dropoffLatLng!);
         setState(() => _model = directions);
-        _model != null
-            ? CameraUpdate.newLatLngBounds(_model!.bounds, 4.0)
-            : null;
+        if (_model != null) {
+          CameraUpdate.newLatLngBounds(_model!.bounds, 4.0);
+          _dist = _model!.totalDist;
+          _durn = _model!.totalDur;
+          _showDist = true;
+        } else {
+          commonSnackbar("Something went wrong, couldn't load route", context);
+        }
       } catch (e) {
         commonSnackbar("Something went wrong, couldn't load route", context);
       }
