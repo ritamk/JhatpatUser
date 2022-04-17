@@ -26,7 +26,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool _mapLoading = true;
   bool _myLocLoading = false;
   bool _showTextFields = true;
-  bool _choosingDest = true;
+  bool _choosingDest = false;
 
   late GoogleMapController _controller;
   late LatLng _initCoord;
@@ -181,17 +181,18 @@ class _HomePageState extends ConsumerState<HomePage> {
           myLocationButtonEnabled: false,
           myLocationEnabled: true,
           compassEnabled: false,
-          // polylines: Set<Polyline>.of(polylines.values),
-          polylines: {
+          polylines: <Polyline>{
             if (_model != null)
               Polyline(
-                polylineId: const PolylineId("poly"),
-                color: Colors.black,
-                width: 5,
                 points: _model!.polyLinePts
                     .map((PointLatLng e) => LatLng(e.latitude, e.longitude))
                     .toList(),
-              )
+                polylineId: PolylineId(_polyLineRouteId),
+                color: Colors.black,
+                width: 5,
+                startCap: Cap.roundCap,
+                endCap: Cap.roundCap,
+              ),
           },
           onCameraMove: (pos) => _cameraPosn = pos,
         ),
@@ -204,16 +205,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               heroTag: "btn3",
               backgroundColor: Colors.black,
               // onPressed: getPolyline,
-              onPressed: () async {
-                if (_pickupLatLng != null && _dropoffLatLng != null) {
-                  final directions = await GetDirections()
-                      .getDirections(_pickupLatLng!, _dropoffLatLng!);
-                  setState(() => _model = directions);
-                  _model != null
-                      ? CameraUpdate.newLatLngBounds(_model!.bounds, 4.0)
-                      : null;
-                }
-              },
+              onPressed: getDirections,
               child: !_routeLoading
                   ? const Icon(Icons.navigation_rounded)
                   : const Loading(white: true),
@@ -246,6 +238,28 @@ class _HomePageState extends ConsumerState<HomePage> {
         body: Loading(white: false, rad: 14.0),
       );
     }
+  }
+
+  /// Fetch route info from Google Directions API
+  void getDirections() async {
+    if (_pickupLatLng != null && _dropoffLatLng != null) {
+      setState(() => _routeLoading = true);
+      try {
+        final directions = await GetDirections()
+            .getDirections(_pickupLatLng!, _dropoffLatLng!);
+        setState(() => _model = directions);
+        _model != null
+            ? CameraUpdate.newLatLngBounds(_model!.bounds, 4.0)
+            : null;
+      } catch (e) {
+        commonSnackbar("Something went wrong, couldn't load route", context);
+      }
+    } else {
+      commonSnackbar(
+          "Either/both of pick-up or/and destination markers have not been set.",
+          context);
+    }
+    setState(() => _routeLoading = false);
   }
 
   /// Initialise the position of the camera at the start of the application.
@@ -327,57 +341,6 @@ class _HomePageState extends ConsumerState<HomePage> {
         _pickupLatLng = coordinate;
       }
     });
-  }
-
-  /// Draws the routes between two points using the polyline data
-  addPolyLine() {
-    PolylineId id = PolylineId(_polyLineRouteId);
-    Polyline polyline = Polyline(
-      polylineId: id,
-      color: Colors.black87,
-      points: polylineCoordinates,
-      width: 5,
-      startCap: Cap.roundCap,
-      endCap: Cap.roundCap,
-    );
-    polylines[id] = polyline;
-    setState(() {});
-  }
-
-  /// Fetches routes from Google Directions API and decodes
-  /// the polyline data and sends it to a function to draw the routes.
-  getPolyline() async {
-    setState(() => _routeLoading = true);
-    if (polylines.isNotEmpty) {
-      setState(() {
-        polylines.clear();
-        polylineCoordinates.clear();
-      });
-    }
-    if (_pickupLatLng != null && _dropoffLatLng != null) {
-      try {
-        PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-          API_KEY,
-          PointLatLng(_pickupLatLng!.latitude, _pickupLatLng!.longitude),
-          PointLatLng(_dropoffLatLng!.latitude, _dropoffLatLng!.longitude),
-          travelMode: TravelMode.driving,
-        );
-        if (result.points.isNotEmpty) {
-          for (PointLatLng point in result.points) {
-            polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-          }
-        }
-        addPolyLine();
-      } catch (e) {
-        print(e.toString());
-        commonSnackbar("Something went wrong, please try again", context);
-      }
-    } else {
-      commonSnackbar(
-          "Either/both of pickup or/and destination marker have not been set",
-          context);
-    }
-    setState(() => _routeLoading = false);
   }
 
   /// Uses the Google Places API to generate search results for places.

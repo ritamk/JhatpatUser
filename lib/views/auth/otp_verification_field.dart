@@ -148,6 +148,7 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
           });
 
           if (verifiedOrNot) {
+            ref.read(phoneNumProvider.state).state == "";
             await UserSharedPreferences.setLoggedInOrNot(true)
                 .whenComplete(() async =>
                     await UserSharedPreferences.setUserPhoneNum(
