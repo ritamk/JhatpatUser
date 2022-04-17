@@ -31,12 +31,39 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
       key: _otpGlobalKey,
       child: Column(
         children: <Widget>[
-          const Text(
-            "OTP Verification",
-            style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.black),
+          SizedBox(
+            width: double.infinity,
+            child: Stack(
+              children: <Widget>[
+                const Center(
+                  child: Text(
+                    "OTP Verification",
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 0.0,
+                  bottom: 0.0,
+                  left: 0.0,
+                  child: Consumer(builder: (context, ref, _) {
+                    return IconButton(
+                      padding: const EdgeInsets.all(0.0),
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () =>
+                          ref.read(otpScreenBoolProvider.state).state = false,
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.red,
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
           Consumer(
             builder: (context, ref, __) {
@@ -166,8 +193,6 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
             await UserSharedPreferences.setLoggedInOrNot(false).whenComplete(
                 () => commonSnackbar("OTP does not match", context));
           }
-
-          ref.read(otpScreenBoolProvider.state).state = false;
         } catch (e) {
           commonSnackbar("Something went wrong, please try again", context);
         }
