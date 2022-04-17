@@ -100,6 +100,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       color: Colors.black, fontSize: 14.0),
                                 ),
                               ),
+                              IconButton(
+                                onPressed: () =>
+                                    setState(() => _choosingDest = false),
+                                icon: Icon(
+                                  Icons.location_on,
+                                  color: !_choosingDest
+                                      ? Colors.red.shade700
+                                      : Colors.red.shade200,
+                                ),
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.all(0.0),
+                                constraints:
+                                    const BoxConstraints.tightForFinite(),
+                                tooltip: "Mark pick-up on map",
+                              ),
                             ],
                           ),
                         ),
@@ -126,6 +141,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       color: Colors.black, fontSize: 14.0),
                                 ),
                               ),
+                              IconButton(
+                                onPressed: () =>
+                                    setState(() => _choosingDest = true),
+                                icon: Icon(
+                                  Icons.location_on,
+                                  color: _choosingDest
+                                      ? Colors.blue.shade700
+                                      : Colors.blue.shade200,
+                                ),
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.all(0.0),
+                                constraints:
+                                    const BoxConstraints.tightForFinite(),
+                                tooltip: "Mark destination on map",
+                              ),
                             ],
                           ),
                         ),
@@ -136,49 +166,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 toolbarHeight: 120.0,
                 elevation: 4.0,
                 backgroundColor: Colors.black,
-                actions: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 18.0),
-                    child: Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: <Widget>[
-                        const SizedBox(width: 15.0),
-                        Positioned(
-                          top: 10.0,
-                          child: IconButton(
-                            onPressed: () =>
-                                setState(() => _choosingDest = false),
-                            icon: Icon(
-                              Icons.location_on,
-                              color: !_choosingDest
-                                  ? Colors.red.shade700
-                                  : Colors.red.shade200,
-                            ),
-                            visualDensity: VisualDensity.compact,
-                            padding: const EdgeInsets.all(0.0),
-                            tooltip: "Mark pick-up on map",
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 10.0,
-                          child: IconButton(
-                            onPressed: () =>
-                                setState(() => _choosingDest = true),
-                            icon: Icon(
-                              Icons.location_on,
-                              color: _choosingDest
-                                  ? Colors.blue.shade700
-                                  : Colors.blue.shade200,
-                            ),
-                            visualDensity: VisualDensity.compact,
-                            padding: const EdgeInsets.all(0.0),
-                            tooltip: "Mark destination on map",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               )
             : const PreferredSize(
                 child: SizedBox(), preferredSize: Size(0.0, 0.0)),
