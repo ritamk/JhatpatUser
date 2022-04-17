@@ -29,7 +29,7 @@ ThemeData customTheme() {
       titleTextStyle: TextStyle(
         fontSize: 22.0,
         fontWeight: FontWeight.bold,
-        color: Colors.red,
+        color: Colors.white,
         fontFamily: "Montserrat",
       ),
       centerTitle: true,

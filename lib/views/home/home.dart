@@ -66,6 +66,15 @@ class _HomePageState extends ConsumerState<HomePage> {
       return Scaffold(
         appBar: _showTextFields
             ? AppBar(
+                leading: Builder(builder: (context) {
+                  return IconButton(
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                    icon: const Icon(
+                      Icons.menu_rounded,
+                      color: Colors.white,
+                    ),
+                  );
+                }),
                 title: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -75,38 +84,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Container(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 8.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20.0),
-                            border: Border.all(color: Colors.black38),
+                            color: Colors.white,
                           ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.max,
                             children: <Widget>[
                               Expanded(
                                 child: Text(
                                   _originString,
                                   style: const TextStyle(
-                                      color: Colors.black54, fontSize: 14.0),
+                                      color: Colors.black, fontSize: 14.0),
                                 ),
-                              ),
-                              Tooltip(
-                                child: ClipOval(
-                                  child: MaterialButton(
-                                    onPressed: () =>
-                                        setState(() => _choosingDest = false),
-                                    child: Icon(
-                                      Icons.location_on,
-                                      color: !_choosingDest
-                                          ? Colors.red.shade700
-                                          : Colors.red.shade200,
-                                    ),
-                                    visualDensity: VisualDensity.compact,
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    minWidth: 24.0,
-                                  ),
-                                ),
-                                message: "Mark pick-up on map",
                               ),
                             ],
                           ),
@@ -119,38 +111,20 @@ class _HomePageState extends ConsumerState<HomePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: Container(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 8.0),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20.0),
-                            border: Border.all(color: Colors.black38),
-                          ),
+                              borderRadius: BorderRadius.circular(20.0),
+                              color: Colors.white),
                           child: Row(
+                            mainAxisSize: MainAxisSize.max,
                             children: <Widget>[
                               Expanded(
                                 child: Text(
                                   _destString,
                                   style: const TextStyle(
-                                      color: Colors.black54, fontSize: 14.0),
+                                      color: Colors.black, fontSize: 14.0),
                                 ),
-                              ),
-                              Tooltip(
-                                child: ClipOval(
-                                  child: MaterialButton(
-                                    onPressed: () =>
-                                        setState(() => _choosingDest = true),
-                                    child: Icon(
-                                      Icons.location_on,
-                                      color: _choosingDest
-                                          ? Colors.blue.shade700
-                                          : Colors.blue.shade200,
-                                    ),
-                                    visualDensity: VisualDensity.compact,
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    minWidth: 24.0,
-                                  ),
-                                ),
-                                message: "Mark destination on map",
                               ),
                             ],
                           ),
@@ -161,7 +135,50 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
                 toolbarHeight: 120.0,
                 elevation: 4.0,
-                backgroundColor: Colors.white,
+                backgroundColor: Colors.black,
+                actions: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 18.0),
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: <Widget>[
+                        const SizedBox(width: 15.0),
+                        Positioned(
+                          top: 10.0,
+                          child: IconButton(
+                            onPressed: () =>
+                                setState(() => _choosingDest = false),
+                            icon: Icon(
+                              Icons.location_on,
+                              color: !_choosingDest
+                                  ? Colors.red.shade700
+                                  : Colors.red.shade200,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.all(0.0),
+                            tooltip: "Mark pick-up on map",
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 10.0,
+                          child: IconButton(
+                            onPressed: () =>
+                                setState(() => _choosingDest = true),
+                            icon: Icon(
+                              Icons.location_on,
+                              color: _choosingDest
+                                  ? Colors.blue.shade700
+                                  : Colors.blue.shade200,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.all(0.0),
+                            tooltip: "Mark destination on map",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               )
             : const PreferredSize(
                 child: SizedBox(), preferredSize: Size(0.0, 0.0)),

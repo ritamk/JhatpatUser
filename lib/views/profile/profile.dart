@@ -53,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Card(
-                  shadowColor: Colors.black38,
+                  shadowColor: Colors.white70,
                   elevation: 6.0,
                   child: TextFormField(
                     controller: _nameController,
@@ -97,13 +97,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: !loading
                           ? const Text("Update",
                               style: TextStyle(fontSize: 16.0))
-                          : const Loading(white: true),
+                          : const Loading(white: false),
                       minWidth: double.infinity,
                       elevation: 0.0,
                       focusElevation: 0.0,
                       highlightElevation: 0.0,
-                      color: Colors.black,
-                      textColor: Colors.white,
+                      color: Colors.white,
+                      textColor: Colors.black,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5.0)),
                     );
@@ -114,6 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
+      backgroundColor: Colors.black,
     );
   }
 

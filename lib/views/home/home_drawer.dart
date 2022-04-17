@@ -28,6 +28,8 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
   bool userProfileComplete = false;
   bool errorLoadingProfile = false;
   UserProfileData? userProfileData;
+  final TextStyle _sectionStyle = const TextStyle(
+      color: Color.fromARGB(202, 255, 255, 255), fontWeight: FontWeight.bold);
 
   @override
   void initState() {
@@ -63,6 +65,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Colors.black,
       child: !loading
           ? ListView(
               children: <Widget>[
@@ -87,12 +90,13 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                                         text: "\n${userProfileData!.name!}",
                                         style: const TextStyle(
                                             fontSize: 20.0,
-                                            color: Colors.red,
+                                            color: Colors.white,
                                             fontWeight: FontWeight.bold)),
                                     TextSpan(
-                                        text: "\n${userProfileData!.email!}",
-                                        style: const TextStyle(
-                                            color: Colors.black45)),
+                                      text: "\n${userProfileData!.email!}",
+                                      style: const TextStyle(
+                                          color: Colors.white54),
+                                    ),
                                   ],
                                 ),
                                 textAlign: TextAlign.center,
@@ -110,18 +114,22 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                                     ),
                                   );
                                 },
-                                child: const Text(
+                                child: Text(
                                   "Complete your profile",
-                                  style: TextStyle(color: Colors.blue),
+                                  style: TextStyle(color: Colors.blue.shade100),
                                 ),
                               ),
                           ],
                         )
-                      : const Icon(Icons.error, size: 50.0),
+                      : const Icon(
+                          Icons.error,
+                          size: 50.0,
+                          color: Colors.white,
+                        ),
                 ),
                 ListTile(
-                  leading: const Icon(Icons.person),
-                  title: const Text("Profile"),
+                  leading: const Icon(Icons.person, color: Colors.white60),
+                  title: Text("Profile", style: _sectionStyle),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -139,8 +147,11 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.payment),
-                  title: const Text("Payment Methods"),
+                  leading: const Icon(Icons.payment, color: Colors.white60),
+                  title: Text(
+                    "Payment Methods",
+                    style: _sectionStyle,
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -149,8 +160,11 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.history),
-                  title: const Text("History"),
+                  leading: const Icon(Icons.history, color: Colors.white60),
+                  title: Text(
+                    "History",
+                    style: _sectionStyle,
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -159,8 +173,11 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.local_offer),
-                  title: const Text("Apply promo code"),
+                  leading: const Icon(Icons.local_offer, color: Colors.white60),
+                  title: Text(
+                    "Apply promo code",
+                    style: _sectionStyle,
+                  ),
                   onTap: () {
                     // Navigator.of(context).push(
                     //   CupertinoPageRoute(builder: (context) => ),
@@ -168,8 +185,11 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.home),
-                  title: const Text("My Addresses"),
+                  leading: const Icon(Icons.home, color: Colors.white60),
+                  title: Text(
+                    "My Addresses",
+                    style: _sectionStyle,
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -178,8 +198,11 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: const Text("Settings"),
+                  leading: const Icon(Icons.settings, color: Colors.white60),
+                  title: Text(
+                    "Settings",
+                    style: _sectionStyle,
+                  ),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -188,8 +211,9 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.support_agent),
-                  title: const Text("Online Support"),
+                  leading:
+                      const Icon(Icons.support_agent, color: Colors.white60),
+                  title: Text("Online Support", style: _sectionStyle),
                   onTap: () {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
@@ -198,16 +222,20 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.power_settings_new),
+                  leading: const Icon(Icons.power_settings_new,
+                      color: Colors.white60),
                   title: !signingOut
-                      ? const Text("Log Out")
-                      : const Loading(white: false),
+                      ? Text(
+                          "Log Out",
+                          style: _sectionStyle,
+                        )
+                      : const Loading(white: true),
                   onTap: () => signOutMethod(),
                 ),
               ],
             )
           : const Center(
-              child: Loading(white: false, rad: 14.0),
+              child: Loading(white: true, rad: 14.0),
             ),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
