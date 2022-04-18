@@ -7,7 +7,6 @@ class SupportPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Support")),
-      backgroundColor: Colors.black,
     );
   }
 }

@@ -55,10 +55,8 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
                       visualDensity: VisualDensity.compact,
                       onPressed: () =>
                           ref.read(otpScreenBoolProvider.state).state = false,
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.red,
-                      ),
+                      icon:
+                          const Icon(Icons.arrow_back_ios, color: Colors.black),
                     );
                   }),
                 ),

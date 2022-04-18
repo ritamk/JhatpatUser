@@ -54,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: <Widget>[
                 Card(
                   shadowColor: Colors.white70,
-                  elevation: 6.0,
+                  elevation: 8.0,
                   child: TextFormField(
                     controller: _nameController,
                     keyboardType: TextInputType.name,
@@ -72,8 +72,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 10.0, width: 0.0),
                 Card(
-                  shadowColor: Colors.black38,
-                  elevation: 6.0,
+                  shadowColor: Colors.white70,
+                  elevation: 8.0,
                   child: TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -96,7 +96,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () => updateButton(context, ref),
                       child: !loading
                           ? const Text("Update",
-                              style: TextStyle(fontSize: 16.0))
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold))
                           : const Loading(white: false),
                       minWidth: double.infinity,
                       elevation: 0.0,
@@ -114,7 +115,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-      backgroundColor: Colors.black,
     );
   }
 

@@ -54,6 +54,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   String _dist = "XX km";
   String _durn = "XX hours XX mins";
 
+  final Color _bgCol = const Color.fromARGB(255, 39, 41, 46);
+
   @override
   void initState() {
     super.initState();
@@ -165,7 +167,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
                 toolbarHeight: 120.0,
                 elevation: 4.0,
-                backgroundColor: Colors.black,
+                backgroundColor: _bgCol,
               )
             : const PreferredSize(
                 child: SizedBox(), preferredSize: Size(0.0, 0.0)),
@@ -200,7 +202,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         .map((PointLatLng e) => LatLng(e.latitude, e.longitude))
                         .toList(),
                     polylineId: PolylineId(_polyLineRouteId),
-                    color: Colors.black,
+                    color: _bgCol,
                     width: 5,
                     startCap: Cap.roundCap,
                     endCap: Cap.roundCap,
@@ -239,7 +241,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           children: <Widget>[
             FloatingActionButton(
               heroTag: "btn3",
-              backgroundColor: Colors.black,
+              backgroundColor: _bgCol,
               // onPressed: getPolyline,
               onPressed: getDirections,
               child: !_routeLoading
@@ -250,7 +252,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(height: 10.0, width: 0.0),
             FloatingActionButton(
               heroTag: "btn2",
-              backgroundColor: Colors.black,
+              backgroundColor: _bgCol,
               onPressed: _turnCompassNorth,
               child: const Icon(Icons.north),
               tooltip: "North",
@@ -258,7 +260,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(height: 10.0, width: 0.0),
             FloatingActionButton(
               heroTag: "btn1",
-              backgroundColor: Colors.black,
+              backgroundColor: _bgCol,
               onPressed: _goToCurrLocation,
               child: !_myLocLoading
                   ? const Icon(Icons.my_location_rounded)
