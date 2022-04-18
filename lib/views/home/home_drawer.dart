@@ -28,8 +28,8 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
   bool userProfileComplete = false;
   bool errorLoadingProfile = false;
   UserProfileData? userProfileData;
-  final TextStyle _sectionStyle =
-      const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold);
+  final TextStyle _sectionStyle = const TextStyle(color: Colors.black87);
+  final Color _sideLogoCol = Colors.black45;
 
   @override
   void initState() {
@@ -76,7 +76,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             CircleAvatar(
-                              maxRadius: 40.0,
+                              maxRadius: 38.0,
                               backgroundImage: Image.asset(
                                       "assets/images/UserProfileDefault.png")
                                   .image,
@@ -84,17 +84,18 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                             if (userProfileComplete)
                               RichText(
                                 text: TextSpan(
+                                  style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontFamily: "Montserrat"),
                                   children: <InlineSpan>[
                                     TextSpan(
-                                        text: "\n${userProfileData!.name!}",
-                                        style: const TextStyle(
-                                            fontSize: 20.0,
-                                            color: Colors.black87,
-                                            fontWeight: FontWeight.bold)),
+                                      text: "\n${userProfileData!.name!}",
+                                      style: const TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                     TextSpan(
                                       text: "\n${userProfileData!.email!}",
-                                      style: const TextStyle(
-                                          color: Colors.black87),
                                     ),
                                   ],
                                 ),
@@ -123,7 +124,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                       : const Icon(Icons.error, size: 50.0, color: Colors.red),
                 ),
                 ListTile(
-                  leading: const Icon(Icons.person, color: Colors.black87),
+                  leading: Icon(Icons.person, color: _sideLogoCol),
                   title: Text("Profile", style: _sectionStyle),
                   onTap: () {
                     Navigator.of(context).push(
@@ -142,7 +143,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.payment, color: Colors.black87),
+                  leading: Icon(Icons.payment, color: _sideLogoCol),
                   title: Text(
                     "Payment Methods",
                     style: _sectionStyle,
@@ -155,7 +156,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.history, color: Colors.black87),
+                  leading: Icon(Icons.history, color: _sideLogoCol),
                   title: Text(
                     "History",
                     style: _sectionStyle,
@@ -168,7 +169,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.local_offer, color: Colors.black87),
+                  leading: Icon(Icons.local_offer, color: _sideLogoCol),
                   title: Text(
                     "Apply promo code",
                     style: _sectionStyle,
@@ -180,7 +181,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.home, color: Colors.black87),
+                  leading: Icon(Icons.home, color: _sideLogoCol),
                   title: Text(
                     "My Addresses",
                     style: _sectionStyle,
@@ -193,7 +194,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.settings, color: Colors.black87),
+                  leading: Icon(Icons.settings, color: _sideLogoCol),
                   title: Text(
                     "Settings",
                     style: _sectionStyle,
@@ -206,8 +207,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading:
-                      const Icon(Icons.support_agent, color: Colors.black87),
+                  leading: Icon(Icons.support_agent, color: _sideLogoCol),
                   title: Text("Online Support", style: _sectionStyle),
                   onTap: () {
                     Navigator.of(context).push(
@@ -217,8 +217,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.power_settings_new,
-                      color: Colors.black87),
+                  leading: Icon(Icons.power_settings_new, color: _sideLogoCol),
                   title: !signingOut
                       ? Text(
                           "Log Out",
