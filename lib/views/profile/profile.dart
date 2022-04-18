@@ -96,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ? const Text("Update",
                               style: TextStyle(
                                   fontSize: 16.0, fontWeight: FontWeight.bold))
-                          : const Loading(white: false),
+                          : const Loading(white: true),
                       minWidth: double.infinity,
                       elevation: 0.0,
                       focusElevation: 0.0,
