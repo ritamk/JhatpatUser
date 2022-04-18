@@ -128,19 +128,21 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   title: Text("Profile", style: _sectionStyle),
                   onTap: () {
                     if (!userProfileComplete) {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => ProfilePage(
+                            profileCompleted: false,
+                            userProfileData: userProfileData!,
+                          ),
+                        ),
+                      );
                     } else {
                       Navigator.of(context).push(
                         CupertinoPageRoute(
-                          builder: (context) => userProfileComplete
-                              ? ProfilePage(
+                            builder: (context) => ProfilePage(
                                   profileCompleted: true,
                                   userProfileData: userProfileData!,
-                                )
-                              : ProfilePage(
-                                  profileCompleted: false,
-                                  userProfileData: userProfileData!,
-                                ),
-                        ),
+                                )),
                       );
                     }
                   },
