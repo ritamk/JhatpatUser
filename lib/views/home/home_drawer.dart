@@ -127,19 +127,22 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                   leading: Icon(Icons.person, color: _sideLogoCol),
                   title: Text("Profile", style: _sectionStyle),
                   onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => userProfileComplete
-                            ? ProfilePage(
-                                profileCompleted: true,
-                                userProfileData: userProfileData!,
-                              )
-                            : ProfilePage(
-                                profileCompleted: false,
-                                userProfileData: userProfileData!,
-                              ),
-                      ),
-                    );
+                    if (!userProfileComplete) {
+                    } else {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => userProfileComplete
+                              ? ProfilePage(
+                                  profileCompleted: true,
+                                  userProfileData: userProfileData!,
+                                )
+                              : ProfilePage(
+                                  profileCompleted: false,
+                                  userProfileData: userProfileData!,
+                                ),
+                        ),
+                      );
+                    }
                   },
                 ),
                 ListTile(

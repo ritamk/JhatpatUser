@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -14,14 +13,14 @@ import 'package:jhatpat/shared/snackbars.dart';
 import 'package:jhatpat/views/home/home_drawer.dart';
 import 'package:jhatpat/views/home/location_services.dart';
 
-class HomePage extends ConsumerStatefulWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool _routeLoading = false;
   bool _mapLoading = true;
   bool _myLocLoading = false;
@@ -46,13 +45,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
   List<LatLng> polylineCoordinates = <LatLng>[];
   PolylinePoints polylinePoints = PolylinePoints();
-  String _destString = "Enter destination point";
-  String _originString = "Enter pick-up point";
+  String _destString = "";
+  String _originString = "";
   MapModel? _model;
   String _dist = "XX km";
   String _durn = "XX hours XX mins";
 
-  final Color _bgCol = const Color.fromARGB(255, 39, 41, 46);
+  final Color _bgCol = const Color.fromARGB(255, 86, 86, 86);
 
   @override
   void initState() {
@@ -63,211 +62,271 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     if (!_mapLoading) {
-      return Scaffold(
-        appBar: _showTextFields
-            ? AppBar(
-                leading: Builder(builder: (context) {
-                  return IconButton(
-                    onPressed: () => Scaffold.of(context).openDrawer(),
-                    icon: const Icon(
-                      Icons.menu_rounded,
-                      color: Colors.white,
-                    ),
-                  );
-                }),
-                title: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    // Pick up
-                    InkWell(
-                      onTap: () => _autcompletePlaces(false),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 8.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20.0),
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(
-                                  _originString,
-                                  style: const TextStyle(
-                                      color: Colors.black, fontSize: 14.0),
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () =>
-                                    setState(() => _choosingDest = false),
-                                icon: Icon(
-                                  Icons.location_on,
-                                  color: !_choosingDest
-                                      ? Colors.red.shade700
-                                      : Colors.red.shade200,
-                                ),
-                                visualDensity: VisualDensity.compact,
-                                padding: const EdgeInsets.all(0.0),
-                                constraints:
-                                    const BoxConstraints.tightForFinite(),
-                                tooltip: "Mark pick-up on map",
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Destination
-                    InkWell(
-                      onTap: () => _autcompletePlaces(true),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 8.0),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              color: Colors.white),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(
-                                  _destString,
-                                  style: const TextStyle(
-                                      color: Colors.black, fontSize: 14.0),
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () =>
-                                    setState(() => _choosingDest = true),
-                                icon: Icon(
-                                  Icons.location_on,
-                                  color: _choosingDest
-                                      ? Colors.blue.shade700
-                                      : Colors.blue.shade200,
-                                ),
-                                visualDensity: VisualDensity.compact,
-                                padding: const EdgeInsets.all(0.0),
-                                constraints:
-                                    const BoxConstraints.tightForFinite(),
-                                tooltip: "Mark destination on map",
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                toolbarHeight: 120.0,
-                elevation: 4.0,
-                backgroundColor: _bgCol,
-              )
-            : const PreferredSize(
-                child: SizedBox(), preferredSize: Size(0.0, 0.0)),
-        body: Stack(
-          alignment: Alignment.bottomCenter,
-          children: <Widget>[
-            GoogleMap(
-              mapType: MapType.normal,
-              initialCameraPosition: _initCamPos,
-              onMapCreated: (GoogleMapController controller) =>
-                  _controller = controller,
-              onLongPress: (LatLng latLng) {
-                addMarker(_choosingDest, latLng);
-              },
-              onTap: (LatLng latLng) {
-                FocusManager.instance.primaryFocus?.unfocus();
-
-                setState(() => _showTextFields
-                    ? _showTextFields = false
-                    : _showTextFields = true);
-              },
-              markers: Set<Marker>.of(markers.values),
-              mapToolbarEnabled: false,
-              zoomControlsEnabled: false,
-              myLocationButtonEnabled: false,
-              myLocationEnabled: true,
-              compassEnabled: false,
-              polylines: <Polyline>{
-                if (_model != null)
-                  Polyline(
-                    points: _model!.polyLinePts
-                        .map((PointLatLng e) => LatLng(e.latitude, e.longitude))
-                        .toList(),
-                    polylineId: PolylineId(_polyLineRouteId),
-                    color: _bgCol,
-                    width: 5,
-                    startCap: Cap.roundCap,
-                    endCap: Cap.roundCap,
-                  ),
-              },
-              onCameraMove: (pos) => _cameraPosn = pos,
-            ),
-            if (_showDist)
-              Positioned(
-                bottom: 25.0,
+      return SafeArea(
+        child: Scaffold(
+          body: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              SizedBox(
+                height: 140.0,
+                width: double.infinity,
                 child: Card(
+                  elevation: 4.0,
+                  margin: const EdgeInsets.all(0.0),
+                  color: _bgCol,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0, vertical: 8.0),
-                    child: Text(
-                      "$_dist, \t$_durn",
-                      style: const TextStyle(
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                      textAlign: TextAlign.center,
+                        horizontal: 4.0, vertical: 4.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Builder(
+                            builder: ((context) => IconButton(
+                                onPressed: () =>
+                                    Scaffold.of(context).openDrawer(),
+                                icon: const Icon(Icons.menu_rounded,
+                                    color: Colors.white)))),
+                        // Pick up
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              InkWell(
+                                onTap: () {
+                                  setState(() => _choosingDest = false);
+                                  _autoCompletePlaces(false);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12.0, horizontal: 8.0),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      color: Colors.white,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Text(
+                                            _originString.isEmpty
+                                                ? "Enter pick-up point"
+                                                : _originString,
+                                            style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 14.0),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          onPressed: () => setState(
+                                              () => _choosingDest = false),
+                                          icon: Icon(
+                                            Icons.location_on,
+                                            color: !_choosingDest
+                                                ? Colors.red.shade700
+                                                : Colors.red.shade100,
+                                          ),
+                                          visualDensity: VisualDensity.compact,
+                                          padding: const EdgeInsets.all(0.0),
+                                          constraints: const BoxConstraints
+                                              .tightForFinite(),
+                                          tooltip: "Mark pick-up on map",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Destination
+                              InkWell(
+                                onTap: () {
+                                  setState(() => _choosingDest = true);
+                                  _autoCompletePlaces(true);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12.0, horizontal: 8.0),
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                        color: Colors.white),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Text(
+                                            _destString.isEmpty
+                                                ? "Enter destination point"
+                                                : _destString,
+                                            style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 14.0),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          onPressed: () => setState(
+                                              () => _choosingDest = true),
+                                          icon: Icon(
+                                            Icons.location_on,
+                                            color: _choosingDest
+                                                ? Colors.blue.shade700
+                                                : Colors.blue.shade100,
+                                          ),
+                                          visualDensity: VisualDensity.compact,
+                                          padding: const EdgeInsets.all(0.0),
+                                          constraints: const BoxConstraints
+                                              .tightForFinite(),
+                                          tooltip: "Mark destination on map",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            if (markers.length > 1) {
+                              String tempStr = _destString;
+                              _destString = _originString;
+                              _originString = tempStr;
+                              LatLng tempLL = _dropoffLatLng!;
+                              _dropoffLatLng = _pickupLatLng;
+                              _pickupLatLng = tempLL;
+                              Marker tempMark =
+                                  markers[MarkerId(_destMarkerId)]!;
+                              markers[MarkerId(_destMarkerId)] =
+                                  markers[MarkerId(_myMarkerId)]!;
+                              print(markers[MarkerId(_destMarkerId)]);
+                              setState(() =>
+                                  markers[MarkerId(_myMarkerId)] = tempMark);
+                            }
+                          },
+                          icon: markers.length > 1
+                              ? const Icon(Icons.swap_vert, color: Colors.white)
+                              : const Icon(Icons.swap_vert,
+                                  color: Colors.white24),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ],
                     ),
                   ),
-                  color: Colors.black,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0)),
-                  elevation: 4.0,
                 ),
               ),
-          ],
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: <Widget>[
+                    GoogleMap(
+                      mapType: MapType.normal,
+                      initialCameraPosition: _initCamPos,
+                      onMapCreated: (GoogleMapController controller) =>
+                          _controller = controller,
+                      onLongPress: (LatLng latLng) {
+                        addMarker(_choosingDest, latLng);
+                      },
+                      onTap: (LatLng latLng) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+
+                        setState(() => _showTextFields
+                            ? _showTextFields = false
+                            : _showTextFields = true);
+                      },
+                      markers: Set<Marker>.of(markers.values),
+                      mapToolbarEnabled: false,
+                      zoomControlsEnabled: false,
+                      myLocationButtonEnabled: false,
+                      myLocationEnabled: true,
+                      compassEnabled: false,
+                      polylines: <Polyline>{
+                        if (_model != null)
+                          Polyline(
+                            points: _model!.polyLinePts
+                                .map((PointLatLng e) =>
+                                    LatLng(e.latitude, e.longitude))
+                                .toList(),
+                            polylineId: PolylineId(_polyLineRouteId),
+                            color: _bgCol,
+                            width: 5,
+                            startCap: Cap.roundCap,
+                            endCap: Cap.roundCap,
+                          ),
+                      },
+                      onCameraMove: (pos) => _cameraPosn = pos,
+                    ),
+                    if (_showDist)
+                      Positioned(
+                        bottom: 25.0,
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: Text(
+                              "$_dist, \t$_durn",
+                              style: const TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          color: Colors.black,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0)),
+                          elevation: 4.0,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          floatingActionButton: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              FloatingActionButton(
+                heroTag: "btn3",
+                backgroundColor: _bgCol,
+                // onPressed: getPolyline,
+                onPressed: getDirections,
+                child: !_routeLoading
+                    ? const Icon(Icons.navigation_rounded)
+                    : const Loading(white: true),
+                tooltip: "Find Route",
+              ),
+              const SizedBox(height: 10.0, width: 0.0),
+              FloatingActionButton(
+                heroTag: "btn2",
+                backgroundColor: _bgCol,
+                onPressed: _turnCompassNorth,
+                child: const Icon(Icons.north),
+                tooltip: "North",
+              ),
+              const SizedBox(height: 10.0, width: 0.0),
+              FloatingActionButton(
+                heroTag: "btn1",
+                backgroundColor: _bgCol,
+                onPressed: _goToCurrLocation,
+                child: !_myLocLoading
+                    ? const Icon(Icons.my_location_rounded)
+                    : const Loading(white: true),
+                tooltip: "Current Location",
+              ),
+            ],
+          ),
+          drawer: const HomeDrawer(),
         ),
-        floatingActionButton: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            FloatingActionButton(
-              heroTag: "btn3",
-              backgroundColor: _bgCol,
-              // onPressed: getPolyline,
-              onPressed: getDirections,
-              child: !_routeLoading
-                  ? const Icon(Icons.navigation_rounded)
-                  : const Loading(white: true),
-              tooltip: "Find Route",
-            ),
-            const SizedBox(height: 10.0, width: 0.0),
-            FloatingActionButton(
-              heroTag: "btn2",
-              backgroundColor: _bgCol,
-              onPressed: _turnCompassNorth,
-              child: const Icon(Icons.north),
-              tooltip: "North",
-            ),
-            const SizedBox(height: 10.0, width: 0.0),
-            FloatingActionButton(
-              heroTag: "btn1",
-              backgroundColor: _bgCol,
-              onPressed: _goToCurrLocation,
-              child: !_myLocLoading
-                  ? const Icon(Icons.my_location_rounded)
-                  : const Loading(white: true),
-              tooltip: "Current Location",
-            ),
-          ],
-        ),
-        drawer: const HomeDrawer(),
       );
     } else {
       return const Scaffold(
@@ -285,7 +344,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             .getDirections(_pickupLatLng!, _dropoffLatLng!);
         setState(() => _model = directions);
         if (_model != null) {
-          CameraUpdate.newLatLngBounds(_model!.bounds, 4.0);
+          _controller.animateCamera(
+              CameraUpdate.newLatLngBounds(_model!.bounds, 30.0));
           _dist = _model!.totalDist;
           _durn = _model!.totalDur;
           _showDist = true;
@@ -365,6 +425,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       position: coordinate,
       icon: BitmapDescriptor.defaultMarkerWithHue(
           destination ? BitmapDescriptor.hueBlue : BitmapDescriptor.hueRed),
+      infoWindow: InfoWindow(
+          title: destination ? "Destination marker" : "Pick-up marker"),
     );
 
     try {
@@ -385,7 +447,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   /// Uses the Google Places API to generate search results for places.
-  _autcompletePlaces(bool dest) async {
+  _autoCompletePlaces(bool dest) async {
     var place = await PlacesAutocomplete.show(
       context: context,
       apiKey: API_KEY,
