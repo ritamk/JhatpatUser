@@ -234,7 +234,7 @@ class _HomePageState extends State<HomePage> {
                       onMapCreated: (GoogleMapController controller) =>
                           _controller = controller,
                       onLongPress: (LatLng latLng) {
-                        addMarker(_choosingDest, latLng);
+                        addMarker(_choosingDest, latLng, false);
                       },
                       onTap: (LatLng latLng) {
                         FocusManager.instance.primaryFocus?.unfocus();
@@ -394,7 +394,7 @@ class _HomePageState extends State<HomePage> {
         tilt: 0.0,
         zoom: _selectedZoom,
       )));
-      addMarker(false, LatLng(coord!.latitude, coord!.longitude));
+      addMarker(false, LatLng(coord!.latitude, coord!.longitude), false);
     } else {
       commonSnackbar("Cannot access current location", context);
     }
@@ -414,16 +414,14 @@ class _HomePageState extends State<HomePage> {
 
   /// Adds a blue marker for pickup location and
   /// a blue marker for drop-off location.
-  void addMarker(bool destination, LatLng coordinate) async {
-    setState(() => destination
-        ? _destString.isEmpty
-            ? null
-            : _destString = "${coordinate.latitude.toStringAsFixed(3)},"
+  void addMarker(bool destination, LatLng coordinate, bool searched) async {
+    searched
+        ? setState(() => destination
+            ? _destString = "${coordinate.latitude.toStringAsFixed(3)},"
                 " ${coordinate.longitude.toStringAsFixed(3)}"
-        : _originString.isEmpty
-            ? null
             : _originString = "${coordinate.latitude.toStringAsFixed(3)},"
-                " ${coordinate.longitude.toStringAsFixed(3)}");
+                " ${coordinate.longitude.toStringAsFixed(3)}")
+        : null;
 
     final MarkerId markerId =
         MarkerId(destination ? _destMarkerId : _myMarkerId);
@@ -490,10 +488,10 @@ class _HomePageState extends State<HomePage> {
 
       if (dest) {
         _dropoffLatLng = LatLng(lat, lang);
-        addMarker(true, _dropoffLatLng!);
+        addMarker(true, _dropoffLatLng!, true);
       } else {
         _pickupLatLng = LatLng(lat, lang);
-        addMarker(false, _pickupLatLng!);
+        addMarker(false, _pickupLatLng!, true);
       }
     }
   }
