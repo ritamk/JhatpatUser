@@ -415,7 +415,7 @@ class _HomePageState extends State<HomePage> {
   /// Adds a blue marker for pickup location and
   /// a blue marker for drop-off location.
   void addMarker(bool destination, LatLng coordinate, bool searched) async {
-    searched
+    !searched
         ? setState(() => destination
             ? _destString = "${coordinate.latitude.toStringAsFixed(3)},"
                 " ${coordinate.longitude.toStringAsFixed(3)}"
