@@ -66,172 +66,366 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
   Widget build(BuildContext context) {
     return Drawer(
       child: !loading
-          ? ListView(
-              children: <Widget>[
-                DrawerHeader(
-                  child: !errorLoadingProfile
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            CircleAvatar(
-                              maxRadius: 38.0,
-                              backgroundImage: Image.asset(
-                                      "assets/images/UserProfileDefault.png")
-                                  .image,
-                            ),
-                            if (userProfileComplete)
-                              RichText(
-                                text: TextSpan(
-                                  style: const TextStyle(
-                                      color: Colors.black87,
-                                      fontFamily: "Montserrat"),
-                                  children: <InlineSpan>[
-                                    TextSpan(
-                                      text: "\n${userProfileData!.name!}",
-                                      style: const TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    TextSpan(
-                                      text: "\n${userProfileData!.email!}",
-                                    ),
-                                  ],
-                                ),
-                                textAlign: TextAlign.center,
-                              )
-                            else
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).push(
-                                    CupertinoPageRoute(
-                                      builder: (context) => ProfilePage(
-                                        profileCompleted: false,
-                                        userProfileData: userProfileData!,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  "Complete your profile",
-                                  style: TextStyle(color: Colors.blue.shade100),
-                                ),
+          ? CustomScrollView(
+              slivers: <Widget>[
+                SliverToBoxAdapter(
+                  child: DrawerHeader(
+                    child: !errorLoadingProfile
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              CircleAvatar(
+                                maxRadius: 38.0,
+                                backgroundImage: Image.asset(
+                                        "assets/images/UserProfileDefault.png")
+                                    .image,
                               ),
-                          ],
-                        )
-                      : const Icon(Icons.error, size: 50.0, color: Colors.red),
+                              if (userProfileComplete)
+                                RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                        color: Colors.black87,
+                                        fontFamily: "Montserrat"),
+                                    children: <InlineSpan>[
+                                      TextSpan(
+                                        text: "\n${userProfileData!.name!}",
+                                        style: const TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      TextSpan(
+                                        text: "\n${userProfileData!.email!}",
+                                      ),
+                                    ],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                )
+                              else
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).push(
+                                      CupertinoPageRoute(
+                                        builder: (context) => ProfilePage(
+                                          profileCompleted: false,
+                                          userProfileData: userProfileData!,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    "Complete your profile",
+                                    style:
+                                        TextStyle(color: Colors.blue.shade100),
+                                  ),
+                                ),
+                            ],
+                          )
+                        : const Icon(Icons.error,
+                            size: 50.0, color: Colors.red),
+                  ),
                 ),
-                ListTile(
-                  leading: Icon(Icons.person, color: _sideLogoCol),
-                  title: Text("Profile", style: _sectionStyle),
-                  onTap: () {
-                    if (!userProfileComplete) {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                          builder: (context) => ProfilePage(
-                            profileCompleted: false,
-                            userProfileData: userProfileData!,
-                          ),
-                        ),
-                      );
-                    } else {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
+                SliverToBoxAdapter(
+                  child: ListTile(
+                    leading: Icon(Icons.person, color: _sideLogoCol),
+                    title: Text("Profile", style: _sectionStyle),
+                    onTap: () {
+                      if (!userProfileComplete) {
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(
                             builder: (context) => ProfilePage(
-                                  profileCompleted: true,
-                                  userProfileData: userProfileData!,
-                                )),
+                              profileCompleted: false,
+                              userProfileData: userProfileData!,
+                            ),
+                          ),
+                        );
+                      } else {
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(
+                              builder: (context) => ProfilePage(
+                                    profileCompleted: true,
+                                    userProfileData: userProfileData!,
+                                  )),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ListTile(
+                    leading: Icon(Icons.payment, color: _sideLogoCol),
+                    title: Text(
+                      "Payment Methods",
+                      style: _sectionStyle,
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                            builder: (context) => const PaymentMethodsPage()),
                       );
-                    }
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.payment, color: _sideLogoCol),
-                  title: Text(
-                    "Payment Methods",
-                    style: _sectionStyle,
+                    },
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                          builder: (context) => const PaymentMethodsPage()),
-                    );
-                  },
                 ),
-                ListTile(
-                  leading: Icon(Icons.history, color: _sideLogoCol),
-                  title: Text(
-                    "History",
-                    style: _sectionStyle,
+                SliverToBoxAdapter(
+                  child: ListTile(
+                    leading: Icon(Icons.history, color: _sideLogoCol),
+                    title: Text(
+                      "History",
+                      style: _sectionStyle,
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                            builder: (context) => const HistoryPage()),
+                      );
+                    },
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                          builder: (context) => const HistoryPage()),
-                    );
-                  },
                 ),
-                ListTile(
-                  leading: Icon(Icons.local_offer, color: _sideLogoCol),
-                  title: Text(
-                    "Apply promo code",
-                    style: _sectionStyle,
+                SliverToBoxAdapter(
+                  child: ListTile(
+                    leading: Icon(Icons.local_offer, color: _sideLogoCol),
+                    title: Text(
+                      "Apply promo code",
+                      style: _sectionStyle,
+                    ),
+                    onTap: () {
+                      // Navigator.of(context).push(
+                      //   CupertinoPageRoute(builder: (context) => ),
+                      // );
+                    },
                   ),
-                  onTap: () {
-                    // Navigator.of(context).push(
-                    //   CupertinoPageRoute(builder: (context) => ),
-                    // );
-                  },
                 ),
-                ListTile(
-                  leading: Icon(Icons.home, color: _sideLogoCol),
-                  title: Text(
-                    "My Addresses",
-                    style: _sectionStyle,
+                SliverToBoxAdapter(
+                  child: ListTile(
+                    leading: Icon(Icons.home, color: _sideLogoCol),
+                    title: Text(
+                      "My Addresses",
+                      style: _sectionStyle,
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                            builder: (context) => const AddressPage()),
+                      );
+                    },
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                          builder: (context) => const AddressPage()),
-                    );
-                  },
                 ),
-                ListTile(
-                  leading: Icon(Icons.settings, color: _sideLogoCol),
-                  title: Text(
-                    "Settings",
-                    style: _sectionStyle,
+                SliverToBoxAdapter(
+                  child: ListTile(
+                    leading: Icon(Icons.settings, color: _sideLogoCol),
+                    title: Text(
+                      "Settings",
+                      style: _sectionStyle,
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                            builder: (context) => const SettingsPage()),
+                      );
+                    },
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                          builder: (context) => const SettingsPage()),
-                    );
-                  },
                 ),
-                ListTile(
-                  leading: Icon(Icons.support_agent, color: _sideLogoCol),
-                  title: Text("Online Support", style: _sectionStyle),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                          builder: (context) => const SupportPage()),
-                    );
-                  },
+                SliverToBoxAdapter(
+                  child: ListTile(
+                    leading: Icon(Icons.support_agent, color: _sideLogoCol),
+                    title: Text("Online Support", style: _sectionStyle),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                            builder: (context) => const SupportPage()),
+                      );
+                    },
+                  ),
                 ),
-                ListTile(
-                  leading: Icon(Icons.power_settings_new, color: _sideLogoCol),
-                  title: !signingOut
-                      ? Text(
-                          "Log Out",
-                          style: _sectionStyle,
-                        )
-                      : const Loading(white: false),
-                  onTap: () => signOutMethod(),
+                SliverToBoxAdapter(
+                  child: ListTile(
+                    leading:
+                        Icon(Icons.power_settings_new, color: _sideLogoCol),
+                    title: !signingOut
+                        ? Text(
+                            "Log Out",
+                            style: _sectionStyle,
+                          )
+                        : const Loading(white: false),
+                    onTap: () => signOutMethod(),
+                  ),
                 ),
               ],
+              // child: ListView(
+              //   children: <Widget>[
+              //     DrawerHeader(
+              //       child: !errorLoadingProfile
+              //           ? Column(
+              //               mainAxisAlignment: MainAxisAlignment.center,
+              //               mainAxisSize: MainAxisSize.min,
+              //               crossAxisAlignment: CrossAxisAlignment.center,
+              //               children: <Widget>[
+              //                 CircleAvatar(
+              //                   maxRadius: 38.0,
+              //                   backgroundImage: Image.asset(
+              //                           "assets/images/UserProfileDefault.png")
+              //                       .image,
+              //                 ),
+              //                 if (userProfileComplete)
+              //                   RichText(
+              //                     text: TextSpan(
+              //                       style: const TextStyle(
+              //                           color: Colors.black87,
+              //                           fontFamily: "Montserrat"),
+              //                       children: <InlineSpan>[
+              //                         TextSpan(
+              //                           text: "\n${userProfileData!.name!}",
+              //                           style: const TextStyle(
+              //                               fontSize: 18.0,
+              //                               fontWeight: FontWeight.bold),
+              //                         ),
+              //                         TextSpan(
+              //                           text: "\n${userProfileData!.email!}",
+              //                         ),
+              //                       ],
+              //                     ),
+              //                     textAlign: TextAlign.center,
+              //                   )
+              //                 else
+              //                   TextButton(
+              //                     onPressed: () {
+              //                       Navigator.of(context).pop();
+              //                       Navigator.of(context).push(
+              //                         CupertinoPageRoute(
+              //                           builder: (context) => ProfilePage(
+              //                             profileCompleted: false,
+              //                             userProfileData: userProfileData!,
+              //                           ),
+              //                         ),
+              //                       );
+              //                     },
+              //                     child: Text(
+              //                       "Complete your profile",
+              //                       style:
+              //                           TextStyle(color: Colors.blue.shade100),
+              //                     ),
+              //                   ),
+              //               ],
+              //             )
+              //           : const Icon(Icons.error,
+              //               size: 50.0, color: Colors.red),
+              //     ),
+              //     ListTile(
+              //       leading: Icon(Icons.person, color: _sideLogoCol),
+              //       title: Text("Profile", style: _sectionStyle),
+              //       onTap: () {
+              //         if (!userProfileComplete) {
+              //           Navigator.of(context).push(
+              //             CupertinoPageRoute(
+              //               builder: (context) => ProfilePage(
+              //                 profileCompleted: false,
+              //                 userProfileData: userProfileData!,
+              //               ),
+              //             ),
+              //           );
+              //         } else {
+              //           Navigator.of(context).push(
+              //             CupertinoPageRoute(
+              //                 builder: (context) => ProfilePage(
+              //                       profileCompleted: true,
+              //                       userProfileData: userProfileData!,
+              //                     )),
+              //           );
+              //         }
+              //       },
+              //     ),
+              //     ListTile(
+              //       leading: Icon(Icons.payment, color: _sideLogoCol),
+              //       title: Text(
+              //         "Payment Methods",
+              //         style: _sectionStyle,
+              //       ),
+              //       onTap: () {
+              //         Navigator.of(context).push(
+              //           CupertinoPageRoute(
+              //               builder: (context) => const PaymentMethodsPage()),
+              //         );
+              //       },
+              //     ),
+              //     ListTile(
+              //       leading: Icon(Icons.history, color: _sideLogoCol),
+              //       title: Text(
+              //         "History",
+              //         style: _sectionStyle,
+              //       ),
+              //       onTap: () {
+              //         Navigator.of(context).push(
+              //           CupertinoPageRoute(
+              //               builder: (context) => const HistoryPage()),
+              //         );
+              //       },
+              //     ),
+              //     ListTile(
+              //       leading: Icon(Icons.local_offer, color: _sideLogoCol),
+              //       title: Text(
+              //         "Apply promo code",
+              //         style: _sectionStyle,
+              //       ),
+              //       onTap: () {
+              //         // Navigator.of(context).push(
+              //         //   CupertinoPageRoute(builder: (context) => ),
+              //         // );
+              //       },
+              //     ),
+              //     ListTile(
+              //       leading: Icon(Icons.home, color: _sideLogoCol),
+              //       title: Text(
+              //         "My Addresses",
+              //         style: _sectionStyle,
+              //       ),
+              //       onTap: () {
+              //         Navigator.of(context).push(
+              //           CupertinoPageRoute(
+              //               builder: (context) => const AddressPage()),
+              //         );
+              //       },
+              //     ),
+              //     ListTile(
+              //       leading: Icon(Icons.settings, color: _sideLogoCol),
+              //       title: Text(
+              //         "Settings",
+              //         style: _sectionStyle,
+              //       ),
+              //       onTap: () {
+              //         Navigator.of(context).push(
+              //           CupertinoPageRoute(
+              //               builder: (context) => const SettingsPage()),
+              //         );
+              //       },
+              //     ),
+              //     ListTile(
+              //       leading: Icon(Icons.support_agent, color: _sideLogoCol),
+              //       title: Text("Online Support", style: _sectionStyle),
+              //       onTap: () {
+              //         Navigator.of(context).push(
+              //           CupertinoPageRoute(
+              //               builder: (context) => const SupportPage()),
+              //         );
+              //       },
+              //     ),
+              //     ListTile(
+              //       leading:
+              //           Icon(Icons.power_settings_new, color: _sideLogoCol),
+              //       title: !signingOut
+              //           ? Text(
+              //               "Log Out",
+              //               style: _sectionStyle,
+              //             )
+              //           : const Loading(white: false),
+              //       onTap: () => signOutMethod(),
+              //     ),
+              //   ],
+              // ),
+              scrollBehavior: const ScrollBehavior(
+                  androidOverscrollIndicator:
+                      AndroidOverscrollIndicator.stretch),
             )
           : const Center(
               child: Loading(white: false, rad: 14.0),
