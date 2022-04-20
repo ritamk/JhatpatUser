@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jhatpat/services/providers.dart';
+import 'package:jhatpat/views/about/privacy_pol.dart';
+import 'package:jhatpat/views/about/terms_cond.dart';
 import 'package:jhatpat/views/auth/otp_verification_field.dart';
 import 'package:jhatpat/views/auth/phone_num_field.dart';
 
@@ -54,28 +57,37 @@ class AuthenticationPage extends StatelessWidget {
                   Image.asset("assets/images/BottomBlack.png"),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 5.0),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: const TextSpan(
-                        style: TextStyle(fontSize: 12.0, color: Colors.white54),
-                        children: <InlineSpan>[
-                          TextSpan(
-                              text: "By signing up, you have agreed to our"),
-                          TextSpan(
-                            text: "\nTerms of Use",
+                    child: Column(
+                      children: <Widget>[
+                        const Text("By signing up, you have agreed to our\n",
                             style: TextStyle(
-                                color: Colors.white70,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(text: " & "),
-                          TextSpan(
-                            text: "Privacy Policy",
-                            style: TextStyle(
-                                color: Colors.white70,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
+                                fontSize: 12.0, color: Colors.white54)),
+                        Row(
+                          children: <Widget>[
+                            TextButton(
+                                onPressed: () => Navigator.of(context).push(
+                                    CupertinoPageRoute(
+                                        builder: (context) =>
+                                            const TermsAndConditionsPage())),
+                                child: const Text("Terms and Conditions",
+                                    style: TextStyle(
+                                        color: Colors.white70,
+                                        fontWeight: FontWeight.bold))),
+                            const Text(" & ",
+                                style: TextStyle(
+                                    fontSize: 12.0, color: Colors.white54)),
+                            TextButton(
+                                onPressed: () => Navigator.of(context).push(
+                                    CupertinoPageRoute(
+                                        builder: (context) =>
+                                            const PrivacyPolicyPage())),
+                                child: const Text("Privacy Policy",
+                                    style: TextStyle(
+                                        color: Colors.white70,
+                                        fontWeight: FontWeight.bold)))
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -83,8 +95,8 @@ class AuthenticationPage extends StatelessWidget {
             ),
           ),
         ],
-        physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics()),
+        scrollBehavior: const ScrollBehavior(
+            androidOverscrollIndicator: AndroidOverscrollIndicator.stretch),
       ),
     );
   }

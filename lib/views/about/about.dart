@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jhatpat/views/support/privacy_pol.dart';
-import 'package:jhatpat/views/support/terms_cond.dart';
+import 'package:jhatpat/views/about/privacy_pol.dart';
+import 'package:jhatpat/views/about/terms_cond.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({Key? key}) : super(key: key);

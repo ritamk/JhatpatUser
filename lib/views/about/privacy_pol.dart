@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class PrivacyPolicyPage extends StatefulWidget {
+class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({Key? key}) : super(key: key);
-
-  @override
-  State<PrivacyPolicyPage> createState() => _PrivacyPolicyPageState();
-}
-
-class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
-  // bool _loading = true;
-  // bool _error = false;
 
   @override
   Widget build(BuildContext context) {

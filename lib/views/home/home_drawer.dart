@@ -7,12 +7,12 @@ import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/shared/snackbars.dart';
+import 'package:jhatpat/views/about/about.dart';
 import 'package:jhatpat/views/history/history.dart';
 import 'package:jhatpat/views/payment/payment.dart';
 import 'package:jhatpat/views/profile/address.dart';
 import 'package:jhatpat/views/profile/profile.dart';
 import 'package:jhatpat/views/settings/settings.dart';
-import 'package:jhatpat/views/support/about.dart';
 import 'package:jhatpat/views/support/support.dart';
 import 'package:jhatpat/wrapper.dart';
 

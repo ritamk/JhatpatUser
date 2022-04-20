@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class TermsAndConditionsPage extends StatefulWidget {
+class TermsAndConditionsPage extends StatelessWidget {
   const TermsAndConditionsPage({Key? key}) : super(key: key);
-
-  @override
-  State<TermsAndConditionsPage> createState() => _TermsAndConditionsPageState();
-}
-
-class _TermsAndConditionsPageState extends State<TermsAndConditionsPage> {
-  // bool _loading = true;
-  // bool _error = false;
 
   @override
   Widget build(BuildContext context) {
