@@ -66,210 +66,191 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: !loading
-          ? CustomScrollView(
-              slivers: <Widget>[
-                SliverToBoxAdapter(
-                  child: DrawerHeader(
-                    child: !errorLoadingProfile
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              CircleAvatar(
-                                maxRadius: 38.0,
-                                backgroundImage: Image.asset(
-                                        "assets/images/UserProfileDefault.png")
-                                    .image,
-                              ),
-                              if (userProfileComplete)
-                                RichText(
-                                  text: TextSpan(
-                                    style: const TextStyle(
-                                        color: Colors.black87,
-                                        fontFamily: "Montserrat"),
-                                    children: <InlineSpan>[
-                                      TextSpan(
-                                        text: "\n${userProfileData!.name!}",
-                                        style: const TextStyle(
-                                            fontSize: 18.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      TextSpan(
-                                        text: "\n${userProfileData!.email!}",
-                                      ),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.center,
-                                )
-                              else
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).push(
-                                      CupertinoPageRoute(
-                                        builder: (context) => ProfilePage(
-                                          profileCompleted: false,
-                                          userProfileData: userProfileData!,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: const Text(
-                                    "Complete your profile",
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                ),
-                            ],
-                          )
-                        : const Icon(Icons.error,
-                            size: 50.0, color: Colors.red),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading: Icon(Icons.person, color: _sideLogoCol),
-                    title: Text("Profile", style: _sectionStyle),
-                    onTap: () {
-                      if (!userProfileComplete) {
-                        Navigator.of(context).push(
-                          CupertinoPageRoute(
-                            builder: (context) => ProfilePage(
-                              profileCompleted: false,
-                              userProfileData: userProfileData!,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: DrawerHeader(
+              child: !loading
+                  ? !errorLoadingProfile
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            CircleAvatar(
+                              maxRadius: 38.0,
+                              backgroundImage: Image.asset(
+                                      "assets/images/UserProfileDefault.png")
+                                  .image,
                             ),
-                          ),
-                        );
-                      } else {
-                        Navigator.of(context).push(
-                          CupertinoPageRoute(
-                              builder: (context) => ProfilePage(
-                                    profileCompleted: true,
-                                    userProfileData: userProfileData!,
-                                  )),
-                        );
-                      }
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading: Icon(Icons.payment, color: _sideLogoCol),
-                    title: Text(
-                      "Payment Methods",
-                      style: _sectionStyle,
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                            builder: (context) => const PaymentMethodsPage()),
-                      );
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading: Icon(Icons.history, color: _sideLogoCol),
-                    title: Text(
-                      "History",
-                      style: _sectionStyle,
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                            builder: (context) => const HistoryPage()),
-                      );
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading: Icon(Icons.local_offer, color: _sideLogoCol),
-                    title: Text(
-                      "Apply promo code",
-                      style: _sectionStyle,
-                    ),
-                    onTap: () {
-                      // Navigator.of(context).push(
-                      //   CupertinoPageRoute(builder: (context) => ),
-                      // );
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading: Icon(Icons.home, color: _sideLogoCol),
-                    title: Text(
-                      "My Addresses",
-                      style: _sectionStyle,
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                            builder: (context) => const AddressPage()),
-                      );
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading: Icon(Icons.settings, color: _sideLogoCol),
-                    title: Text(
-                      "Settings",
-                      style: _sectionStyle,
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                            builder: (context) => const SettingsPage()),
-                      );
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading: Icon(Icons.support_agent, color: _sideLogoCol),
-                    title: Text("Online Support", style: _sectionStyle),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                            builder: (context) => const SupportPage()),
-                      );
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading: Icon(Icons.info, color: _sideLogoCol),
-                    title: Text("About", style: _sectionStyle),
-                    onTap: () => Navigator.of(context).push(
-                      CupertinoPageRoute(
-                          builder: (context) => const AboutPage()),
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    leading:
-                        Icon(Icons.power_settings_new, color: _sideLogoCol),
-                    title: !signingOut
-                        ? Text(
-                            "Log Out",
-                            style: _sectionStyle,
-                          )
-                        : const Loading(white: false),
-                    onTap: () => signOutMethod(),
-                  ),
-                ),
-              ],
-              scrollBehavior: const ScrollBehavior(
-                  androidOverscrollIndicator:
-                      AndroidOverscrollIndicator.stretch),
-            )
-          : const Center(
-              child: Loading(white: false, rad: 14.0),
+                            if (userProfileComplete)
+                              RichText(
+                                text: TextSpan(
+                                  style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontFamily: "Montserrat"),
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                      text: "\n${userProfileData!.name!}",
+                                      style: const TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text: "\n${userProfileData!.email!}",
+                                    ),
+                                  ],
+                                ),
+                                textAlign: TextAlign.center,
+                              )
+                            else
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).push(
+                                    CupertinoPageRoute(
+                                      builder: (context) => const ProfilePage(),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Complete your profile",
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                              ),
+                          ],
+                        )
+                      : const Icon(Icons.error, size: 50.0, color: Colors.red)
+                  : const Loading(white: false),
             ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.person, color: _sideLogoCol),
+              title: Text("Profile", style: _sectionStyle),
+              onTap: () {
+                if (!userProfileComplete) {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const ProfilePage(),
+                    ),
+                  );
+                } else {
+                  Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ));
+                }
+              },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.payment, color: _sideLogoCol),
+              title: Text(
+                "Payment Methods",
+                style: _sectionStyle,
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                      builder: (context) => const PaymentMethodsPage()),
+                );
+              },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.history, color: _sideLogoCol),
+              title: Text(
+                "History",
+                style: _sectionStyle,
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (context) => const HistoryPage()),
+                );
+              },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.local_offer, color: _sideLogoCol),
+              title: Text(
+                "Apply promo code",
+                style: _sectionStyle,
+              ),
+              onTap: () {
+                // Navigator.of(context).push(
+                //   CupertinoPageRoute(builder: (context) => ),
+                // );
+              },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.home, color: _sideLogoCol),
+              title: Text(
+                "My Addresses",
+                style: _sectionStyle,
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (context) => const AddressPage()),
+                );
+              },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.settings, color: _sideLogoCol),
+              title: Text(
+                "Settings",
+                style: _sectionStyle,
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(
+                      builder: (context) => const SettingsPage()),
+                );
+              },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.support_agent, color: _sideLogoCol),
+              title: Text("Online Support", style: _sectionStyle),
+              onTap: () {
+                Navigator.of(context).push(
+                  CupertinoPageRoute(builder: (context) => const SupportPage()),
+                );
+              },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.info, color: _sideLogoCol),
+              title: Text("About", style: _sectionStyle),
+              onTap: () => Navigator.of(context).push(
+                CupertinoPageRoute(builder: (context) => const AboutPage()),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: ListTile(
+              leading: Icon(Icons.power_settings_new, color: _sideLogoCol),
+              title: !signingOut
+                  ? Text(
+                      "Log Out",
+                      style: _sectionStyle,
+                    )
+                  : const Loading(white: false),
+              onTap: () => signOutMethod(),
+            ),
+          ),
+        ],
+        scrollBehavior: const ScrollBehavior(
+            androidOverscrollIndicator: AndroidOverscrollIndicator.stretch),
+      ),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(20.0),
