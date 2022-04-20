@@ -4,7 +4,7 @@ import 'package:http/http.dart';
 import 'package:jhatpat/models/user.dart';
 
 // ignore: constant_identifier_names
-const String API_KEY = "AIzaSyB5qjb68yarSDbxov_kMSFahxbU57MLvAI";
+const String API_KEY = "AIzaSyAVveVNAsAKcU6lX9p53j6YBzCKrfoo_gk";
 
 class DatabaseService {
   DatabaseService({this.token});

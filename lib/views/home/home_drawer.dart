@@ -12,6 +12,7 @@ import 'package:jhatpat/views/payment/payment.dart';
 import 'package:jhatpat/views/profile/address.dart';
 import 'package:jhatpat/views/profile/profile.dart';
 import 'package:jhatpat/views/settings/settings.dart';
+import 'package:jhatpat/views/support/about.dart';
 import 'package:jhatpat/views/support/support.dart';
 import 'package:jhatpat/wrapper.dart';
 
@@ -115,10 +116,9 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                                       ),
                                     );
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     "Complete your profile",
-                                    style:
-                                        TextStyle(color: Colors.blue.shade100),
+                                    style: TextStyle(color: Colors.blue),
                                   ),
                                 ),
                             ],
@@ -241,6 +241,16 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
                 ),
                 SliverToBoxAdapter(
                   child: ListTile(
+                    leading: Icon(Icons.info, color: _sideLogoCol),
+                    title: Text("About", style: _sectionStyle),
+                    onTap: () => Navigator.of(context).push(
+                      CupertinoPageRoute(
+                          builder: (context) => const AboutPage()),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ListTile(
                     leading:
                         Icon(Icons.power_settings_new, color: _sideLogoCol),
                     title: !signingOut
@@ -283,14 +293,3 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
     setState(() => signingOut = false);
   }
 }
-
-
-// const CircleAvatar(
-  //   maxRadius: 50.0,
-  //   child: Icon(
-  //     Icons.person_outline_rounded,
-  //     size: 80.0,
-  //     color: Colors.white,
-  //   ),
-  //   backgroundColor: Colors.grey,
-// ),
