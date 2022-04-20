@@ -416,10 +416,14 @@ class _HomePageState extends State<HomePage> {
   /// a blue marker for drop-off location.
   void addMarker(bool destination, LatLng coordinate) async {
     setState(() => destination
-        ? _destString = "${coordinate.latitude.toStringAsFixed(3)},"
-            " ${coordinate.longitude.toStringAsFixed(3)}"
-        : _originString = "${coordinate.latitude.toStringAsFixed(3)},"
-            " ${coordinate.longitude.toStringAsFixed(3)}");
+        ? _destString.isEmpty
+            ? null
+            : _destString = "${coordinate.latitude.toStringAsFixed(3)},"
+                " ${coordinate.longitude.toStringAsFixed(3)}"
+        : _originString.isEmpty
+            ? null
+            : _originString = "${coordinate.latitude.toStringAsFixed(3)},"
+                " ${coordinate.longitude.toStringAsFixed(3)}");
 
     final MarkerId markerId =
         MarkerId(destination ? _destMarkerId : _myMarkerId);
