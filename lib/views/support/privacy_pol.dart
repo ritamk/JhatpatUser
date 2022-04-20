@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jhatpat/shared/error_widget.dart';
-import 'package:jhatpat/shared/loading.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PrivacyPolicyPage extends StatefulWidget {
