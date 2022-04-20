@@ -58,37 +58,68 @@ class AuthenticationPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 5.0),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        const Text("By signing up, you have agreed to our\n",
+                        const Text("By signing up, you have agreed to our",
                             style: TextStyle(
                                 fontSize: 12.0, color: Colors.white54)),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            TextButton(
-                                onPressed: () => Navigator.of(context).push(
-                                    CupertinoPageRoute(
-                                        builder: (context) =>
-                                            const TermsAndConditionsPage())),
-                                child: const Text("Terms and Conditions",
-                                    style: TextStyle(
-                                        color: Colors.white70,
-                                        fontWeight: FontWeight.bold))),
+                            InkWell(
+                              child: const Text("Terms and Conditions",
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.bold)),
+                              onTap: () => Navigator.of(context).push(
+                                  CupertinoPageRoute(
+                                      builder: (context) =>
+                                          const TermsAndConditionsPage())),
+                            ),
                             const Text(" & ",
                                 style: TextStyle(
                                     fontSize: 12.0, color: Colors.white54)),
-                            TextButton(
-                                onPressed: () => Navigator.of(context).push(
-                                    CupertinoPageRoute(
-                                        builder: (context) =>
-                                            const PrivacyPolicyPage())),
-                                child: const Text("Privacy Policy",
-                                    style: TextStyle(
-                                        color: Colors.white70,
-                                        fontWeight: FontWeight.bold)))
+                            InkWell(
+                              child: const Text("Privacy Policy",
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.bold)),
+                              onTap: () => Navigator.of(context).push(
+                                  CupertinoPageRoute(
+                                      builder: (context) =>
+                                          const PrivacyPolicyPage())),
+                            )
                           ],
                         ),
                       ],
                     ),
+                    // child: RichText(
+                    //   textAlign: TextAlign.center,
+                    //   text: const TextSpan(
+                    //     style: TextStyle(fontSize: 12.0, color: Colors.white54),
+                    //     children: <InlineSpan>[
+                    //       TextSpan(
+                    //           text: "By signing up, you have agreed to our"),
+                    //       TextSpan(
+                    //         text: "\nTerms of Use",
+                    //         style: TextStyle(
+                    //             color: Colors.white70,
+                    //             fontWeight: FontWeight.bold),
+                    //       ),
+                    //       TextSpan(text: " & "),
+                    //       TextSpan(
+                    //         text: "Privacy Policy",
+                    //         style: TextStyle(
+                    //             color: Colors.white70,
+                    //             fontWeight: FontWeight.bold),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                   ),
                 ],
               ),

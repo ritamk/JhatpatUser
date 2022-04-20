@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
 import 'package:jhatpat/shared/text_field_deco.dart';
@@ -20,6 +21,7 @@ class OTPVerificationField extends StatefulWidget {
 class OTPVerificationFieldState extends State<OTPVerificationField> {
   final GlobalKey<FormState> _otpGlobalKey = GlobalKey<FormState>();
   String _otp = "";
+  final TextEditingController _otpController = TextEditingController();
   final FocusNode _otpFocusNode = FocusNode();
 
   bool loading = false;
@@ -87,6 +89,7 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
               onChanged: (val) => _otp = val,
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
+              controller: _otpController,
             ),
           ),
           const SizedBox(height: 5.0, width: 0.0),
@@ -143,19 +146,21 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
     final String? token = ref.watch(tokenProvider);
 
     setState(() => resendOtpLoading = true);
-    try {
-      final bool resentOrNot = await DatabaseService(token: token)
-          .getResendOtp()
-          .whenComplete(() => setState(() => resendOtpLoading = false));
 
-      if (resentOrNot) {
-        commonSnackbar("OTP resent", context);
+    try {
+      final UserLoginRegData? result = await DatabaseService()
+          .postLoginRegister(phNum: ref.watch(phoneNumProvider));
+      if (result.runtimeType == UserLoginRegData) {
+        commonSnackbar("OTP resent successfully", context);
+        ref.read(tokenProvider.state).state = result?.token;
       } else {
-        commonSnackbar("Could not generate OTP, please try again", context);
+        commonSnackbar("Something went wrong, please try again", context);
       }
     } catch (e) {
-      commonSnackbar("Something went wrong, please try again", context);
+      commonSnackbar("e.toString()", context);
+      setState(() => loading = false);
     }
+    setState(() => resendOtpLoading = false);
   }
 
   verifyButton(BuildContext context, WidgetRef ref) async {
@@ -173,23 +178,27 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
           });
 
           if (verifiedOrNot) {
-            ref.read(phoneNumProvider.state).state == "";
             await UserSharedPreferences.setLoggedInOrNot(true)
                 .whenComplete(() async =>
                     await UserSharedPreferences.setUserPhoneNum(
                         ref.watch(phoneNumProvider)))
                 .whenComplete(
                     () async => await UserSharedPreferences.setUserToken(token))
-                .whenComplete(
-                  () => Navigator.pushAndRemoveUntil(
-                      context,
-                      CupertinoPageRoute(
-                          builder: (context) => const HomePage()),
-                      (route) => false),
-                );
+                .whenComplete(() {
+              ref.read(otpScreenBoolProvider.state).state = false;
+              ref.read(phoneNumProvider.state).state = "";
+              ref.read(tokenProvider.state).state = "";
+            }).whenComplete(
+              () => Navigator.pushAndRemoveUntil(
+                  context,
+                  CupertinoPageRoute(builder: (context) => const HomePage()),
+                  (route) => false),
+            );
           } else {
             await UserSharedPreferences.setLoggedInOrNot(false).whenComplete(
                 () => commonSnackbar("OTP does not match", context));
+            _otp = "";
+            _otpController.clear();
           }
         } catch (e) {
           commonSnackbar("Something went wrong, please try again", context);
@@ -220,6 +229,7 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
 
   @override
   void dispose() {
+    _otpController.dispose();
     _otpFocusNode.dispose();
     super.dispose();
   }

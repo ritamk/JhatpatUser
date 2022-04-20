@@ -217,6 +217,7 @@ class _HomePageState extends State<HomePage> {
                               : const Icon(Icons.swap_vert,
                                   color: Colors.white30),
                           visualDensity: VisualDensity.compact,
+                          tooltip: "Switch destination and pick-up points",
                         ),
                       ],
                     ),
@@ -414,6 +415,12 @@ class _HomePageState extends State<HomePage> {
   /// Adds a blue marker for pickup location and
   /// a blue marker for drop-off location.
   void addMarker(bool destination, LatLng coordinate) async {
+    setState(() => destination
+        ? _destString = "${coordinate.latitude.toStringAsFixed(3)},"
+            " ${coordinate.longitude.toStringAsFixed(3)}"
+        : _originString = "${coordinate.latitude.toStringAsFixed(3)},"
+            " ${coordinate.longitude.toStringAsFixed(3)}");
+
     final MarkerId markerId =
         MarkerId(destination ? _destMarkerId : _myMarkerId);
 
@@ -448,7 +455,7 @@ class _HomePageState extends State<HomePage> {
     var place = await PlacesAutocomplete.show(
       context: context,
       apiKey: API_KEY,
-      mode: Mode.overlay,
+      mode: Mode.fullscreen,
       types: [],
       strictbounds: false,
       onError: (gmwp.PlacesAutocompleteResponse e) => print(e.errorMessage),
