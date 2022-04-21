@@ -9,6 +9,7 @@ import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/shared/snackbars.dart';
 import 'package:jhatpat/views/home/home.dart';
+import 'package:pinput/pinput.dart';
 
 class OTPVerificationField extends StatefulWidget {
   const OTPVerificationField({Key? key}) : super(key: key);
@@ -70,28 +71,26 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
               return Text(
                 "\nPlease check your messages for the OTP"
                 "\nthat has been sent to +91${ref.watch(phoneNumProvider)}",
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black45),
                 textAlign: TextAlign.center,
               );
             },
           ),
           const SizedBox(height: 30.0, width: 0.0),
-          Card(
-            shadowColor: Colors.black38,
-            elevation: 6.0,
-            child: TextFormField(
-              keyboardType: TextInputType.number,
-              decoration:
-                  authTextInputDecoration("4 digit OTP", Icons.lock, null),
-              style: const TextStyle(color: Colors.black, fontSize: 16.0),
+          Consumer(builder: (context, ref, __) {
+            return Pinput(
               focusNode: _otpFocusNode,
-              validator: validation,
-              onChanged: (val) => _otp = val,
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
               controller: _otpController,
-            ),
-          ),
+              onChanged: (val) => _otp = val,
+              onCompleted: (val) => verifyButton(context, ref),
+              onSubmitted: (val) => verifyButton(context, ref),
+              validator: (val) => validation(val),
+              androidSmsAutofillMethod:
+                  AndroidSmsAutofillMethod.smsUserConsentApi,
+              listenForMultipleSmsOnAndroid: true,
+              autofocus: true,
+            );
+          }),
           const SizedBox(height: 5.0, width: 0.0),
           Align(
             alignment: Alignment.centerRight,
@@ -143,8 +142,6 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
   }
 
   void resendOtpButton(BuildContext context, WidgetRef ref) async {
-    final String? token = ref.watch(tokenProvider);
-
     setState(() => resendOtpLoading = true);
 
     try {
@@ -185,7 +182,6 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
                 .whenComplete(
                     () async => await UserSharedPreferences.setUserToken(token))
                 .whenComplete(() {
-              ref.read(otpScreenBoolProvider.state).state = false;
               ref.read(phoneNumProvider.state).state = "";
               ref.read(tokenProvider.state).state = "";
             }).whenComplete(

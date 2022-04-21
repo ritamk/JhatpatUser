@@ -235,18 +235,20 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: ListTile(
-              leading: Icon(Icons.power_settings_new, color: _sideLogoCol),
-              title: !signingOut
-                  ? Text(
-                      "Log Out",
-                      style: _sectionStyle,
-                    )
-                  : const Loading(white: false),
-              onTap: () => signOutMethod(),
-            ),
-          ),
+          Consumer(builder: (context, ref, __) {
+            return SliverToBoxAdapter(
+              child: ListTile(
+                leading: Icon(Icons.power_settings_new, color: _sideLogoCol),
+                title: !signingOut
+                    ? Text(
+                        "Log Out",
+                        style: _sectionStyle,
+                      )
+                    : const Loading(white: false),
+                onTap: () => signOutMethod(ref),
+              ),
+            );
+          }),
         ],
         scrollBehavior: const ScrollBehavior(
             androidOverscrollIndicator: AndroidOverscrollIndicator.stretch),
@@ -258,12 +260,14 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer> {
     );
   }
 
-  void signOutMethod() async {
+  void signOutMethod(WidgetRef ref) async {
     setState(() => signingOut = true);
     try {
       UserSharedPreferences.setLoggedInOrNot(false)
           .whenComplete(() => UserSharedPreferences.setUserToken(""))
-          .whenComplete(() => UserSharedPreferences.setUserPhoneNum(""));
+          .whenComplete(() => UserSharedPreferences.setUserPhoneNum(""))
+          .whenComplete(
+              () => ref.read(otpScreenBoolProvider.state).state = false);
       await Navigator.of(context).pushAndRemoveUntil(
           CupertinoPageRoute(builder: (context) => const WrapperPage()),
           (route) => false);

@@ -18,6 +18,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
   final GlobalKey<FormState> _phNoGlobalKey = GlobalKey<FormState>();
   String _phoneNum = "";
   final FocusNode _phoneFocusNode = FocusNode();
+  final TextEditingController _phoneController = TextEditingController();
   bool loading = false;
 
   @override
@@ -34,7 +35,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
                   "Phone number", Icons.phone_android, "+91 "),
               style: const TextStyle(color: Colors.black, fontSize: 16.0),
               focusNode: _phoneFocusNode,
-              validator: validation,
+              validator: (val) => validation(val),
               onChanged: (val) => _phoneNum = val,
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
@@ -42,6 +43,10 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
           ),
           const SizedBox(height: 20.0, width: 0.0),
           Consumer(builder: (context, ref, __) {
+            if (ref.watch(phoneNumProvider).isNotEmpty) {
+              _phoneController.text = ref.watch(phoneNumProvider);
+            }
+
             return MaterialButton(
               onPressed: () => continueButton(context, ref),
               child: !loading
