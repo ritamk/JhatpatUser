@@ -78,6 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: <Widget>[
                           Card(
                             elevation: 6.0,
+                            shadowColor: Colors.black38,
                             child: TextFormField(
                               controller: _nameController,
                               keyboardType: TextInputType.name,
@@ -98,6 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           const SizedBox(height: 10.0, width: 0.0),
                           Card(
                             elevation: 6.0,
+                            shadowColor: Colors.black38,
                             child: TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
