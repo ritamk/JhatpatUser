@@ -62,232 +62,207 @@ class _HomePageState extends State<HomePage> {
     if (!_mapLoading) {
       return SafeArea(
         child: Scaffold(
-          body: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                          bottomRight: Radius.circular(5.0),
-                          bottomLeft: Radius.circular(5.0))),
-                  elevation: 4.0,
-                  margin: const EdgeInsets.all(0.0),
-                  color: _bgCol,
+          appBar: AppBar(
+            title: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                // Pickup
+                InkWell(
+                  onTap: () {
+                    setState(() => _choosingDest = false);
+                    _autoCompletePlaces(false);
+                  },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 4.0, vertical: 4.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Builder(
-                            builder: ((context) => IconButton(
-                                onPressed: () =>
-                                    Scaffold.of(context).openDrawer(),
-                                icon: const Icon(Icons.menu_rounded,
-                                    color: Colors.white)))),
-                        // Pick up
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              InkWell(
-                                onTap: () {
-                                  setState(() => _choosingDest = false);
-                                  _autoCompletePlaces(false);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12.0, horizontal: 8.0),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      color: Colors.white,
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: Text(
-                                            _originString.isEmpty
-                                                ? "Enter pick-up point"
-                                                : _originString,
-                                            style: const TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 14.0),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () => setState(
-                                              () => _choosingDest = false),
-                                          icon: Icon(
-                                            Icons.location_on,
-                                            color: !_choosingDest
-                                                ? Colors.red.shade700
-                                                : Colors.red.shade100,
-                                          ),
-                                          visualDensity: VisualDensity.compact,
-                                          padding: const EdgeInsets.all(0.0),
-                                          constraints: const BoxConstraints
-                                              .tightForFinite(),
-                                          tooltip: "Mark pick-up on map",
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Destination
-                              InkWell(
-                                onTap: () {
-                                  setState(() => _choosingDest = true);
-                                  _autoCompletePlaces(true);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12.0, horizontal: 8.0),
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                        color: Colors.white),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: Text(
-                                            _destString.isEmpty
-                                                ? "Enter destination point"
-                                                : _destString,
-                                            style: const TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 14.0),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () => setState(
-                                              () => _choosingDest = true),
-                                          icon: Icon(
-                                            Icons.location_on,
-                                            color: _choosingDest
-                                                ? Colors.blue.shade700
-                                                : Colors.blue.shade100,
-                                          ),
-                                          visualDensity: VisualDensity.compact,
-                                          padding: const EdgeInsets.all(0.0),
-                                          constraints: const BoxConstraints
-                                              .tightForFinite(),
-                                          tooltip: "Mark destination on map",
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        color: Colors.white,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              _originString.isEmpty
+                                  ? "Enter pick-up point"
+                                  : _originString,
+                              style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.normal),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            if (markers.length > 1) {
-                              String tempStr = _destString;
-                              _destString = _originString;
-                              _originString = tempStr;
-                              LatLng tempLL = _dropoffLatLng!;
-                              _dropoffLatLng = _pickupLatLng;
-                              _pickupLatLng = tempLL;
-                              Marker tempMark =
-                                  markers[MarkerId(_destMarkerId)]!;
-                              markers[MarkerId(_destMarkerId)] =
-                                  markers[MarkerId(_myMarkerId)]!;
-
-                              setState(() =>
-                                  markers[MarkerId(_myMarkerId)] = tempMark);
-                            }
-                          },
-                          icon: markers.length > 1
-                              ? const Icon(Icons.swap_vert, color: Colors.white)
-                              : const Icon(Icons.swap_vert,
-                                  color: Colors.white30),
-                          visualDensity: VisualDensity.compact,
-                          tooltip: "Switch destination and pick-up points",
-                        ),
-                      ],
+                          IconButton(
+                            onPressed: () =>
+                                setState(() => _choosingDest = false),
+                            icon: Icon(
+                              Icons.location_on,
+                              color: !_choosingDest
+                                  ? Colors.red.shade700
+                                  : Colors.red.shade100,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.all(0.0),
+                            constraints: const BoxConstraints.tightForFinite(),
+                            tooltip: "Mark pick-up on map",
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    GoogleMap(
-                      mapType: MapType.normal,
-                      initialCameraPosition: _initCamPos,
-                      onMapCreated: (GoogleMapController controller) =>
-                          _controller = controller,
-                      onLongPress: (LatLng latLng) {
-                        addMarker(_choosingDest, latLng, false);
-                      },
-                      onTap: (LatLng latLng) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                      },
-                      markers: Set<Marker>.of(markers.values),
-                      mapToolbarEnabled: false,
-                      zoomControlsEnabled: false,
-                      myLocationButtonEnabled: false,
-                      myLocationEnabled: true,
-                      compassEnabled: false,
-                      polylines: <Polyline>{
-                        if (_model != null)
-                          Polyline(
-                            points: _model!.polyLinePts
-                                .map((PointLatLng e) =>
-                                    LatLng(e.latitude, e.longitude))
-                                .toList(),
-                            polylineId: PolylineId(_polyLineRouteId),
-                            color: _bgCol,
-                            width: 5,
-                            startCap: Cap.roundCap,
-                            endCap: Cap.roundCap,
-                          ),
-                      },
-                      onCameraMove: (pos) => _cameraPosn = pos,
-                    ),
-                    if (_showDist)
-                      Positioned(
-                        bottom: 25.0,
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12.0, vertical: 8.0),
+                // Destination
+                InkWell(
+                  onTap: () {
+                    setState(() => _choosingDest = true);
+                    _autoCompletePlaces(true);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20.0),
+                          color: Colors.white),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Expanded(
                             child: Text(
-                              "$_dist, \t$_durn",
+                              _destString.isEmpty
+                                  ? "Enter destination point"
+                                  : _destString,
                               style: const TextStyle(
-                                  fontSize: 15.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                              textAlign: TextAlign.center,
+                                  color: Colors.black87,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.normal),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          color: Colors.black,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25.0)),
-                          elevation: 4.0,
-                        ),
+                          IconButton(
+                            onPressed: () =>
+                                setState(() => _choosingDest = true),
+                            icon: Icon(
+                              Icons.location_on,
+                              color: _choosingDest
+                                  ? Colors.blue.shade700
+                                  : Colors.blue.shade100,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                            padding: const EdgeInsets.all(0.0),
+                            constraints: const BoxConstraints.tightForFinite(),
+                            tooltip: "Mark destination on map",
+                          ),
+                        ],
                       ),
-                  ],
+                    ),
+                  ),
                 ),
+              ],
+            ),
+            leading: Builder(
+              builder: ((context) => IconButton(
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                    icon: const Icon(Icons.menu_rounded, color: Colors.white),
+                  )),
+            ),
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  if (markers.length > 1) {
+                    String tempStr = _destString;
+                    _destString = _originString;
+                    _originString = tempStr;
+                    LatLng tempLL = _dropoffLatLng!;
+                    _dropoffLatLng = _pickupLatLng;
+                    _pickupLatLng = tempLL;
+                    Marker tempMark = markers[MarkerId(_destMarkerId)]!;
+                    markers[MarkerId(_destMarkerId)] =
+                        markers[MarkerId(_myMarkerId)]!;
+
+                    setState(() => markers[MarkerId(_myMarkerId)] = tempMark);
+                  }
+                },
+                icon: markers.length > 1
+                    ? const Icon(Icons.swap_vert, color: Colors.white)
+                    : const Icon(Icons.swap_vert, color: Colors.white30),
+                visualDensity: VisualDensity.compact,
+                tooltip: "Switch destination and pick-up points",
               ),
             ],
+            toolbarHeight: 140.0,
+            backgroundColor: _bgCol,
+            elevation: 4.0,
           ),
+          body: Stack(
+            alignment: Alignment.bottomCenter,
+            children: <Widget>[
+              GoogleMap(
+                mapType: MapType.normal,
+                initialCameraPosition: _initCamPos,
+                onMapCreated: (GoogleMapController controller) =>
+                    _controller = controller,
+                onLongPress: (LatLng latLng) {
+                  addMarker(_choosingDest, latLng, false);
+                },
+                onTap: (LatLng latLng) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+                markers: Set<Marker>.of(markers.values),
+                mapToolbarEnabled: false,
+                zoomControlsEnabled: false,
+                myLocationButtonEnabled: false,
+                myLocationEnabled: true,
+                compassEnabled: false,
+                polylines: <Polyline>{
+                  if (_model != null)
+                    Polyline(
+                      points: _model!.polyLinePts
+                          .map((PointLatLng e) =>
+                              LatLng(e.latitude, e.longitude))
+                          .toList(),
+                      polylineId: PolylineId(_polyLineRouteId),
+                      color: _bgCol,
+                      width: 5,
+                      startCap: Cap.roundCap,
+                      endCap: Cap.roundCap,
+                    ),
+                },
+                onCameraMove: (pos) => _cameraPosn = pos,
+              ),
+              if (_showDist)
+                Positioned(
+                  bottom: 25.0,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 8.0),
+                      child: Text(
+                        "$_dist, \t$_durn",
+                        style: const TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    color: Colors.black,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25.0)),
+                    elevation: 4.0,
+                  ),
+                ),
+            ],
+          ),
+          // ),
+          // ],
+          // ),
           floatingActionButton: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.end,

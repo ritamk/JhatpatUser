@@ -77,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Card(
-                            elevation: 4.0,
+                            elevation: 6.0,
                             child: TextFormField(
                               controller: _nameController,
                               keyboardType: TextInputType.name,
@@ -97,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 10.0, width: 0.0),
                           Card(
-                            elevation: 4.0,
+                            elevation: 6.0,
                             child: TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
