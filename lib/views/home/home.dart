@@ -432,10 +432,10 @@ class _HomePageState extends State<HomePage> {
     var place = await PlacesAutocomplete.show(
       context: context,
       apiKey: API_KEY,
-      mode: Mode.fullscreen,
       types: [],
       strictbounds: false,
-      onError: (gmwp.PlacesAutocompleteResponse e) => print(e.errorMessage),
+      onError: (gmwp.PlacesAutocompleteResponse e) =>
+          commonSnackbar(e.toString(), context),
     );
 
     if (place != null) {
