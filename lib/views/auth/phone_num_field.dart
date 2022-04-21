@@ -39,6 +39,7 @@ class _PhoneNumberFieldState extends State<PhoneNumberField> {
               onChanged: (val) => _phoneNum = val,
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (val) => FocusScope.of(context).unfocus(),
+              keyboardType: TextInputType.phone,
             ),
           ),
           const SizedBox(height: 20.0, width: 0.0),

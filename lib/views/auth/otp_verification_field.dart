@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jhatpat/models/user.dart';
 import 'package:jhatpat/services/database/database.dart';
 import 'package:jhatpat/services/shared_pref.dart';
-import 'package:jhatpat/shared/text_field_deco.dart';
 import 'package:jhatpat/shared/loading.dart';
 import 'package:jhatpat/services/providers.dart';
 import 'package:jhatpat/shared/snackbars.dart';
@@ -13,7 +12,6 @@ import 'package:pinput/pinput.dart';
 
 class OTPVerificationField extends StatefulWidget {
   const OTPVerificationField({Key? key}) : super(key: key);
-  // final Function? homeFxn;
 
   @override
   State<OTPVerificationField> createState() => OTPVerificationFieldState();
