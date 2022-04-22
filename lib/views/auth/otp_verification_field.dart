@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,9 +24,24 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
   String _otp = "";
   final TextEditingController _otpController = TextEditingController();
   final FocusNode _otpFocusNode = FocusNode();
+  late Timer _timer;
 
+  int _secsRem = 30;
+  bool _canResendOtp = false;
   bool loading = false;
   bool resendOtpLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      if (_secsRem != 0) {
+        setState(() => _secsRem--);
+      } else {
+        setState(() => _canResendOtp = true);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,25 +109,46 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
           const SizedBox(height: 5.0, width: 0.0),
           Align(
             alignment: Alignment.centerRight,
-            child: Consumer(
-              builder: (context, ref, __) {
-                return TextButton(
-                  style: ButtonStyle(
-                      padding:
-                          MaterialStateProperty.all(const EdgeInsets.all(0.0))),
-                  onPressed: () => resendOtpButton(context, ref),
-                  child: !resendOtpLoading
-                      ? const Text(
-                          "Resend OTP",
-                          style: TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : const Loading(white: false),
-                );
-              },
-            ),
+            child: _canResendOtp
+                ? Consumer(
+                    builder: (context, ref, __) {
+                      return TextButton(
+                        style: ButtonStyle(
+                            padding: MaterialStateProperty.all(
+                                const EdgeInsets.all(0.0))),
+                        onPressed: () => resendOtpButton(context, ref),
+                        child: !resendOtpLoading
+                            ? const Text(
+                                "Resend OTP",
+                                style: TextStyle(
+                                    fontSize: 15.0,
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.bold),
+                              )
+                            : const Loading(white: false),
+                      );
+                    },
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: RichText(
+                      text: TextSpan(
+                        children: <TextSpan>[
+                          const TextSpan(text: "Request OTP again in "),
+                          TextSpan(
+                            text: _secsRem.toString(),
+                            style: const TextStyle(
+                                fontSize: 14.0,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const TextSpan(text: " seconds"),
+                        ],
+                        style: const TextStyle(
+                            fontSize: 13.0, color: Colors.black54),
+                      ),
+                    ),
+                  ),
           ),
           const SizedBox(height: 5.0, width: 0.0),
           Consumer(
@@ -148,6 +186,10 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
       if (result.runtimeType == UserLoginRegData) {
         commonSnackbar("OTP resent successfully", context);
         ref.read(tokenProvider.state).state = result?.token;
+        setState(() {
+          _secsRem = 30;
+          _canResendOtp = false;
+        });
       } else {
         commonSnackbar("Something went wrong, please try again", context);
       }
@@ -225,6 +267,7 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
   void dispose() {
     _otpController.dispose();
     _otpFocusNode.dispose();
+    _timer.cancel();
     super.dispose();
   }
 }
