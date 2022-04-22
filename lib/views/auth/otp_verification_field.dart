@@ -134,7 +134,7 @@ class OTPVerificationFieldState extends State<OTPVerificationField> {
                     child: RichText(
                       text: TextSpan(
                         children: <TextSpan>[
-                          const TextSpan(text: "Request OTP again in "),
+                          const TextSpan(text: "Request OTP again after "),
                           TextSpan(
                             text: _secsRem.toString(),
                             style: const TextStyle(
